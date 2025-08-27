@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dinamik Isı - Görev Takip Listesi (Canlı)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* Tailwind gray-50 */
+        }
+        .task-item.completed label {
+            text-decoration: line-through;
+            color: #9ca3af; /* Tailwind gray-400 */
+        }
+        .task-item.completed .task-text {
+             color: #9ca3af; /* Tailwind gray-400 */
+        }
+        .progress-bar-fill {
+            transition: width 0.5s ease-in-out;
+        }
+        .sub-item {
+            padding-left: 2.75rem; /* Checkbox + icon hizalaması için */
+        }
+        /* Custom checkbox stili */
+        input[type="checkbox"] {
+            appearance: none;
+            -webkit-appearance: none;
+            height: 1.25rem;
+            width: 1.25rem;
+            border-radius: 0.375rem;
+            border: 2px solid #cbd5e1; /* Tailwind gray-300 */
+            cursor: pointer;
+            display: inline-block;
+            position: relative;
+            margin-right: 0.75rem;
+            flex-shrink: 0;
+        }
+        input[type="checkbox"]:checked {
+            background-color: #3b82f6; /* Tailwind blue-500 */
+            border-color: #3b82f6;
+        }
+        input[type="checkbox"]:checked::after {
+            content: '✔';
+            font-size: 0.8rem;
+            color: white;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        #connection-status {
+            transition: opacity 0.5s;
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-6 md:p-8">
+
+    <div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-lg p-6 sm:p-8">
+        
+        <!-- Başlık Alanı -->
+        <div class="flex items-center justify-between mb-6 border-b pb-4">
+            <div>
+                <h1 class="text-2xl sm:text-3xl font-bold text-gray-800">Dinamik Isı - Geliştirme Görev Listesi</h1>
+                <p class="text-gray-500 mt-1">Toplantı notlarına göre oluşturulan görev takip listesi.</p>
+            </div>
+             <div id="connection-status" class="flex items-center space-x-2 opacity-0">
+                <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                <span class="text-sm font-medium text-gray-600">Canlı Bağlantı Aktif</span>
+            </div>
+        </div>
+
+        <!-- İlerleme Çubuğu -->
+        <div class="mb-8">
+            <div class="flex justify-between items-center mb-2">
+                <span class="text-sm font-medium text-gray-600">Genel İlerleme</span>
+                <span id="progress-text" class="text-sm font-bold text-blue-600">0%</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                <div id="progress-bar" class="bg-blue-500 h-2.5 rounded-full progress-bar-fill" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <!-- Görev Listesi Alanı -->
+        <div id="task-list" class="space-y-8">
+            <!-- Görevler buraya dinamik olarak eklenecek -->
+        </div>
+    </div>
+
+    <script type="module">
+        // Firebase SDK'lerini import et
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- GÖREV VERİLERİ ---
+        const tasks = [
+            {
+                section: "Genel CRM ve Müşteri Yönetimi",
+                icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283-.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>`,
+                items: [
+                    { id: 'logo_fix', text: 'Logo Yükleme Sorunu: Canlı ortamda cari detay sayfasında logo yüklenememesi hatasını gider.', completed: false },
+                    { id: 'required_fields', text: 'Zorunlu Alanlar (Yeni Müşteri Formu)', completed: false, subItems: [
+                        { id: 'tc_vergi_disable', text: 'TC Kimlik No veya Vergi No alanlarından biri doldurulduğunda diğerinin disable olmasını sağla.', completed: false },
+                        { id: 'sol_alanlar_zorunlu', text: 'Sol kısımdaki tüm bilgi alanlarının doldurulmasını zorunlu tut.', completed: false }
+                    ]},
+                    { id: 'cariler_revizyon', text: 'Cari Listesi ve Kullanıcı Yönetimi Revizyonu', completed: false, subItems: [
+                        { id: 'ispayingclient_kaldir', text: 'isPaymentClient sistemini ve mantığını projeden tamamen kaldır.', completed: false },
+                        { id: 'cari_kullanici_kaldir', text: '"Cari Kullanıcı" durumunu gösteren statü bileşenini ve ilgili butonları/işlevleri kaldır.', completed: false }
+                    ]},
+                    { id: 'onay_bekleyen_degisiklik', text: '"Onay Bekleyen Cariler" Sayfasının Değiştirilmesi', completed: false, subItems: [
+                        { id: 'onay_bekleyen_kaldir', text: 'Mevcut "Onay Bekleyen Cariler" sayfasını kaldır.', completed: false },
+                        { id: 'guncellenen_cariler_sayfasi', text: 'Yeni sayfa oluştur: "Bilgileri Güncellenen Cariler".', completed: false },
+                        { id: 'guncellenen_cariler_liste', text: 'Bu yeni sayfaya, sadece CRM\'de bilgileri güncellenmiş carileri listele.', completed: false },
+                        { id: 'netsis_guncelle_buton', text: '"Netsis İçerisinde Güncelle" butonunu ekle ve işlevsel hale getir.', completed: false }
+                    ]},
+                    { id: 'kayit_gecmisi', text: 'Kayıt Geçmişi (Loglama): Cari detay ekranına, kaydı kimin oluşturduğunu ve kimlerin ne zaman güncelleme yaptığını gösteren bir log bölümü ekle.', completed: false },
+                ]
+            },
+            {
+                section: "Teklif ve Sipariş Akışı",
+                icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg>`,
+                items: [
+                    { id: 'siparis_filtreleme', text: 'Sipariş Listesi Filtreleme: Onay durumu, mevcut durum ve oluşturan kullanıcıya göre filtreleme ekle.', completed: false },
+                    { id: 'siparis_onay_yetki', text: 'Sipariş Onay Akışı ve Yetkilendirme', completed: false, subItems: [
+                        { id: 'yeni_roller_yetkiler', text: 'Sipariş onaylama ve Netsis\'e aktarma için yeni Roller ve Yetkiler tanımla.', completed: false },
+                        { id: 'finans_onay_sayfasi', text: 'Yeni sayfa/bölüm oluştur: "Finans Onayı Bekleyen Siparişler".', completed: false },
+                        { id: 'finans_yetkisi', text: 'Sadece "Finans Yetkilisi" rolüne sahip kullanıcıların siparişleri onaylayabilmesini sağla.', completed: false },
+                        { id: 'planlama_yetkisi', text: 'Sadece "Planlama Yetkilisi" rolüne sahip kullanıcıların, finans onayı almış siparişleri Netsis\'e aktarabilmesini sağla.', completed: false }
+                    ]},
+                    { id: 'dosya_ekleme_hata', text: 'Siparişe Dosya Ekleme Hatası: Sipariş formunda dosya eklerken alınan "Access denied" hatasını çöz.', completed: false },
+                    { id: 'bozma_yetkisi', text: '"Bozma" Yetkisi: Onaylanmış bir siparişi/teklifi iptal etmek için özel bir yetki tanımla (Not ile ret).', completed: false },
+                ]
+            },
+            {
+                section: "Raporlama",
+                icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>`,
+                items: [
+                    { id: 'teklif_durum_raporu', text: 'Yeni Rapor: Belirli bir tarih aralığındaki tekliflerin (verilen, onaylanan, reddedilen) durum raporunu oluştur.', completed: false, subItems: [
+                        { id: 'red_sebepleri', text: 'Teklif Durum Raporu\'na reddedilen teklifler için "Ret Sebepleri"ni de ekle.', completed: false }
+                    ]},
+                    { id: 'yeni_musteri_raporu', text: 'Yeni Rapor: Hangi kullanıcının kaç adet yeni müşteri kaydı açtığını gösteren raporu oluştur.', completed: false },
+                    { id: 'cari_duzeltme_loglari', text: 'Yeni Rapor/Log: Cariler üzerinde yapılan tüm değişiklikleri gösteren log ekranı oluştur (Kim, ne zaman, neyi değiştirdi?).', completed: false },
+                    { id: 'irsaliye_raporu', text: 'İrsaliye Raporu: İrsaliyelerin listeleneceği ve görüntüleneceği yeni bir rapor sayfası oluştur.', completed: false },
+                ]
+            },
+            {
+                section: "Yetkilendirme ve Roller",
+                icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>`,
+                items: [
+                    { id: 'yeni_yetki_seviyeleri', text: 'Yeni Yetki Seviyeleri: "Pazarlama" ve "Finans" kullanıcıları için yeni yetki seviyeleri ve rolleri tanımla.', completed: false },
+                    { id: 'cari_guncelleme_kisitlama', text: 'Cari Güncelleme Kısıtlaması: Cari detay sayfasındaki ana bilgi alanlarının sadece özel yetkiye sahip kullanıcılar tarafından güncellenebilmesini sağla.', completed: false },
+                ]
+            },
+            {
+                section: "Netsis Entegrasyonu",
+                icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>`,
+                items: [
+                    { id: 'siparis_aktarim_esneklik', text: 'Sipariş Aktarım Esnekliği: Siparişlerin Netsis\'e aktarılma ekranında, zorunlu alanlar dışındaki tüm alanların boş (nullable) bırakılabilir olmasını sağla.', completed: false },
+                    { id: 'veri_standardizasyon', text: 'Veri Standardizasyonu: Yeni müşteri oluşturulurken girilen tüm metin bilgilerinin, Netsis\'e gönderilmeden önce otomatik olarak büyük harfe çevrilmesini sağla.', completed: false },
+                ]
+            }
+        ];
+
+        // --- UYGULAMA MANTIĞI ---
+        const taskListContainer = document.getElementById('task-list');
+        const progressBar = document.getElementById('progress-bar');
+        const progressText = document.getElementById('progress-text');
+        const connectionStatus = document.getElementById('connection-status');
+
+        let db; 
+        let checklistDocRef; 
+
+        async function setupFirebase() {
+            try {
+                // SENİN PROJENİN BAĞLANTI BİLGİLERİ
+                const firebaseConfig = {
+                  apiKey: "AIzaSyBkE1ZA4R8H8dtXzQK3_1f-ziASaqRWbNM",
+                  authDomain: "checklist-44855.firebaseapp.com",
+                  projectId: "checklist-44855",
+                  storageBucket: "checklist-44855.firebasestorage.app",
+                  messagingSenderId: "287422053970",
+                  appId: "1:287422053970:web:0f47ebb4fa2e98aba0298b"
+                };
+
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                const auth = getAuth(app);
+                
+                // DÜZELTİLMİŞ DOKÜMAN YOLU
+                const docPath = `checklists/dinamik_isi_state`;
+                checklistDocRef = doc(db, docPath);
+
+                await signInAnonymously(auth);
+                
+                listenForUpdates();
+
+            } catch (error) {
+                console.error("Firebase initialization error:", error);
+                taskListContainer.innerHTML = `<p class="text-red-500 text-center">Bağlantı hatası: ${error.message}. Ortak çalışma özelliği devre dışı.</p>`;
+            }
+        }
+
+        function listenForUpdates() {
+            onSnapshot(checklistDocRef, (docSnap) => {
+                connectionStatus.style.opacity = 1;
+                if (docSnap.exists()) {
+                    const savedTasks = docSnap.data().tasks || [];
+                    tasks.forEach(section => {
+                        section.items.forEach(item => {
+                            const savedItem = savedTasks.find(t => t.id === item.id);
+                            if (savedItem) item.completed = savedItem.completed;
+                            if (item.subItems) {
+                                item.subItems.forEach(subItem => {
+                                    const savedSubItem = savedTasks.find(t => t.id === subItem.id);
+                                    if (savedSubItem) subItem.completed = savedSubItem.completed;
+                                });
+                            }
+                        });
+                    });
+                } else {
+                    saveState();
+                }
+                renderTasks();
+                updateProgress();
+            }, (error) => {
+                console.error("Firestore listener error:", error);
+                connectionStatus.innerHTML = `<div class="w-3 h-3 bg-red-500 rounded-full"></div><span class="text-sm font-medium text-red-600">Bağlantı Koptu</span>`;
+                connectionStatus.style.opacity = 1;
+            });
+        }
+
+        async function saveState() {
+            if (!checklistDocRef) return;
+            const stateToSave = [];
+            tasks.forEach(section => {
+                section.items.forEach(item => {
+                    stateToSave.push({ id: item.id, completed: item.completed });
+                    if (item.subItems) {
+                        item.subItems.forEach(subItem => {
+                            stateToSave.push({ id: subItem.id, completed: subItem.completed });
+                        });
+                    }
+                });
+            });
+            try {
+                await setDoc(checklistDocRef, { tasks: stateToSave });
+            } catch (error) {
+                console.error("Error saving state to Firestore:", error);
+            }
+        }
+
+        function updateProgress() {
+            let totalTasks = 0;
+            let completedTasks = 0;
+            tasks.forEach(section => {
+                section.items.forEach(item => {
+                    if (item.subItems) {
+                        totalTasks += item.subItems.length;
+                        completedTasks += item.subItems.filter(si => si.completed).length;
+                    } else {
+                        totalTasks++;
+                        if (item.completed) completedTasks++;
+                    }
+                });
+            });
+
+            const percentage = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+            progressBar.style.width = `${percentage}%`;
+            progressText.textContent = `${percentage}% (${completedTasks}/${totalTasks})`;
+        }
+
+        function handleTaskClick(item, isSubItem = false) {
+            item.completed = !item.completed;
+
+            if (isSubItem) {
+                tasks.forEach(section => {
+                    section.items.forEach(parentItem => {
+                        if (parentItem.subItems && parentItem.subItems.some(si => si.id === item.id)) {
+                            parentItem.completed = parentItem.subItems.every(si => si.completed);
+                        }
+                    });
+                });
+            }
+
+            if (!isSubItem && item.subItems) {
+                item.subItems.forEach(subItem => {
+                    subItem.completed = item.completed;
+                });
+            }
+            
+            renderTasks();
+            updateProgress();
+            saveState();
+        }
+
+        function renderTasks() {
+            taskListContainer.innerHTML = '';
+            tasks.forEach(section => {
+                const sectionDiv = document.createElement('div');
+                sectionDiv.innerHTML = `<div class="flex items-center border-b border-gray-200 pb-2 mb-4">${section.icon}<h2 class="text-xl font-semibold text-gray-700">${section.section}</h2></div>`;
+                const itemList = document.createElement('div');
+                itemList.className = 'space-y-3';
+
+                section.items.forEach(item => {
+                    const taskItemDiv = document.createElement('div');
+                    taskItemDiv.className = `task-item flex items-start p-2 rounded-lg ${item.completed ? 'completed' : ''}`;
+                    
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.checked = item.completed;
+                    checkbox.id = item.id;
+                    checkbox.addEventListener('click', () => handleTaskClick(item));
+                    
+                    const label = document.createElement('label');
+                    label.htmlFor = item.id;
+                    label.className = 'flex-grow cursor-pointer';
+
+                    const taskTextSpan = document.createElement('span');
+                    taskTextSpan.className = 'font-medium text-gray-800 task-text';
+                    taskTextSpan.textContent = item.text;
+                    
+                    label.appendChild(taskTextSpan);
+                    taskItemDiv.appendChild(checkbox);
+                    taskItemDiv.appendChild(label);
+                    
+                    itemList.appendChild(taskItemDiv);
+
+                    if (item.subItems) {
+                        item.subItems.forEach(subItem => {
+                            const subItemDiv = document.createElement('div');
+                            subItemDiv.className = `task-item sub-item flex items-start p-2 rounded-lg ${subItem.completed ? 'completed' : ''}`;
+                            const subCheckbox = document.createElement('input');
+                            subCheckbox.type = 'checkbox';
+                            subCheckbox.checked = subItem.completed;
+                            subCheckbox.id = subItem.id;
+                            subCheckbox.addEventListener('click', () => handleTaskClick(subItem, true));
+                            const subLabel = document.createElement('label');
+                            subLabel.htmlFor = subItem.id;
+                            subLabel.className = 'flex-grow cursor-pointer';
+                            const subTaskTextSpan = document.createElement('span');
+                            subTaskTextSpan.className = 'text-gray-600 task-text';
+                            subTaskTextSpan.textContent = subItem.text;
+                            subLabel.appendChild(subTaskTextSpan);
+                            subItemDiv.appendChild(subCheckbox);
+                            subItemDiv.appendChild(subLabel);
+                            itemList.appendChild(subItemDiv);
+                        });
+                    }
+                });
+                sectionDiv.appendChild(itemList);
+                taskListContainer.appendChild(sectionDiv);
+            });
+        }
+
+        // Uygulamayı başlat
+        setupFirebase();
+
+    </script>
+</body>
+</html>
