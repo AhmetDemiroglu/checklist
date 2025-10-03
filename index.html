@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dinamik Isı - Yeni Görev Listesi (Canlı)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+        .task-item.completed label {
+            text-decoration: line-through;
+            color: #9ca3af;
+        }
+        .task-item.completed .task-text {
+             color: #9ca3af;
+        }
+        .progress-bar-fill {
+            transition: width 0.5s ease-in-out;
+        }
+        .sub-item {
+            padding-left: 2.75rem;
+        }
+        input[type="checkbox"] {
+            appearance: none;
+            -webkit-appearance: none;
+            height: 1.25rem;
+            width: 1.25rem;
+            border-radius: 0.375rem;
+            border: 2px solid #cbd5e1;
+            cursor: pointer;
+            display: inline-block;
+            position: relative;
+            margin-right: 0.75rem;
+            flex-shrink: 0;
+        }
+        input[type="checkbox"]:checked {
+            background-color: #3b82f6;
+            border-color: #3b82f6;
+        }
+        input[type="checkbox"]:checked::after {
+            content: '✔';
+            font-size: 0.8rem;
+            color: white;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        #connection-status {
+            transition: opacity 0.5s;
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-6 md:p-8">
+
+    <div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-lg p-6 sm:p-8">
+        
+        <div class="flex items-center justify-between mb-6 border-b pb-4">
+            <div>
+                <h1 class="text-2xl sm:text-3xl font-bold text-gray-800">Dinamik Isı - Yeni Geliştirme Görevleri</h1>
+                <p class="text-gray-500 mt-1">Yeni toplantı notlarına göre oluşturulan görev takip listesi.</p>
+            </div>
+             <div id="connection-status" class="flex items-center space-x-2 opacity-0">
+                <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                <span class="text-sm font-medium text-gray-600">Canlı Bağlantı Aktif</span>
+            </div>
+        </div>
+
+        <div class="mb-8">
+            <div class="flex justify-between items-center mb-2">
+                <span class="text-sm font-medium text-gray-600">Genel İlerleme</span>
+                <span id="progress-text" class="text-sm font-bold text-blue-600">0%</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                <div id="progress-bar" class="bg-blue-500 h-2.5 rounded-full progress-bar-fill" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <div id="task-list" class="space-y-8">
+            </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- YENİ GÖREV VERİLERİ ---
+        const tasks = [
+            {
+                section: "Hata Düzeltmeleri (Bug Fixes)",
+                icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`,
+                items: [
+                    { id: 'netsis_depokodu_fix', text: 'Netsis\'e aktarma formundaki Depo Kodu JSON format hatasını gider.', completed: false },
+                    { id: 'mail_ek_alici_fix', text: 'Teklif/Siparişte manuel eklenen ek e-posta adreslerine mail gitmemesi sorununu çöz.', completed: false },
+                    { id: 'arama_iyilestirme', text: 'Ürünler ve Carilerdeki arama mantığını iyileştir (örn: "MN" yazınca "MND" de gelsin).', completed: false },
+                    { id: 'rapor_sayfalama_fix', text: 'Cari Değişiklik Raporu sayfasındaki hatalı sayfalama bilgisini ("x kayıt arasından y gösteriliyor") düzelt.', completed: false },
+                    { id: 'profil_ekran_fix', text: 'Müşteri Profili ekranında eksik olan TC alanını ekle, boş gelen VKN/VD alanlarını doldur.', completed: false },
+                ]
+            },
+            {
+                section: "Kullanıcı Arayüzü (UI/UX) İyileştirmeleri",
+                icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>`,
+                items: [
+                    { id: 'netsis_sube_ui', text: 'Netsis\'e aktarma formunda "Şube" alanını seçim listesi yerine statik (basılı) bir bilgi olarak göster.', completed: false },
+                    { id: 'otomatik_varsayilan', text: 'Otomatik Varsayılan: Eklenen ilk iletişim kişisi ve ilk adresin otomatik olarak "varsayılan" olarak işaretlenmesini sağla.', completed: false },
+                    { id: 'telefon_arama_link', text: 'Girilen telefon numaralarını, tıklandığında arama başlatacak şekilde linke (`tel:`) dönüştür.', completed: false },
+                    { id: 'telefon_formatlama', text: 'İletişim Bilgileri ve Cari Bilgileri alanlarındaki telefon girişlerine, seçilen ülke koduna göre otomatik formatlama ekle ve ülke kodunu zorunlu tut.', completed: false },
+                ]
+            },
+            {
+                section: "Yeni Özellikler ve Yetkilendirme",
+                icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`,
+                items: [
+                    { id: 'siparis_detay_alanlar', text: 'Teklifteki "Müşteri Sip. No.", "İr. Fat." ve "İr. İlgili Kişi" alanlarını sipariş detay formuna da ekle.', completed: false },
+                    { id: 'tc_vkn_kontrol', text: 'CustomerTemp (Onay Bekleyen Cari) için TC/VKN-VD kontrolünü ekle: Biri dolunca diğeri kilitlensin.', completed: false },
+                    { id: 'siparis_silme_yetki', text: 'İptal edilmiş siparişleri silebilme özelliği ekle. (Bu işlem için yeni ve özel bir yetki tanımlanacak).', completed: false },
+                ]
+            },
+            {
+                section: "E-Posta Bildirimleri",
+                icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>`,
+                items: [
+                    { id: 'onay_maili_herkese', text: 'Finans ve Planlama Onayına düşen talepler için ilgili yetkiye sahip tüm kullanıcılara bildirim maili gönder.', completed: false },
+                    { id: 'musteri_mail_optimizasyon', text: 'Müşteriye sadece "Teklif oluşturulduğunda" ve "Planlama onaylayıp siparişe dönüştüğünde" mail gönder. Ara onay adımlarında mail gönderme.', completed: false },
+                ]
+            },
+             {
+                section: "Veri Temizliği ve Kapanış",
+                icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>`,
+                items: [
+                    { id: 'test_veri_temizle', text: 'Tüm geliştirmeler bittikten sonra test verilerini temizle (Carisi "Habib Yılmaz" ve "Sedbim" olan tüm sipariş ve teklifleri sil).', completed: false },
+                ]
+            }
+        ];
+
+        // --- UYGULAMA MANTIĞI ---
+        const taskListContainer = document.getElementById('task-list');
+        const progressBar = document.getElementById('progress-bar');
+        const progressText = document.getElementById('progress-text');
+        const connectionStatus = document.getElementById('connection-status');
+
+        let db; 
+        let checklistDocRef; 
+
+        async function setupFirebase() {
+            try {
+                // Bu bilgiler bir önceki adımdan alınmıştır.
+                const firebaseConfig = {
+                  apiKey: "AIzaSyBkE1ZA4R8H8dtXzQK3_1f-ziASaqRWbNM",
+                  authDomain: "checklist-44855.firebaseapp.com",
+                  projectId: "checklist-44855",
+                  storageBucket: "checklist-44855.firebasestorage.app",
+                  messagingSenderId: "287422053970",
+                  appId: "1:287422053970:web:0f47ebb4fa2e98aba0298b"
+                };
+
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                const auth = getAuth(app);
+                
+                const docPath = `checklists/dinamik_isi_yeni_istekler`; // Yeni liste için yeni bir doküman yolu
+                checklistDocRef = doc(db, docPath);
+
+                await signInAnonymously(auth);
+                
+                listenForUpdates();
+
+            } catch (error) {
+                console.error("Firebase initialization error:", error);
+                taskListContainer.innerHTML = `<p class="text-red-500 text-center">Bağlantı hatası: ${error.message}. Ortak çalışma özelliği devre dışı.</p>`;
+            }
+        }
+
+        function listenForUpdates() {
+            onSnapshot(checklistDocRef, (docSnap) => {
+                connectionStatus.style.opacity = 1;
+                if (docSnap.exists()) {
+                    const savedTasks = docSnap.data().tasks || [];
+                    tasks.forEach(section => {
+                        section.items.forEach(item => {
+                            const savedItem = savedTasks.find(t => t.id === item.id);
+                            if (savedItem) item.completed = savedItem.completed;
+                            if (item.subItems) {
+                                item.subItems.forEach(subItem => {
+                                    const savedSubItem = savedTasks.find(t => t.id === subItem.id);
+                                    if (savedSubItem) subItem.completed = savedSubItem.completed;
+                                });
+                            }
+                        });
+                    });
+                } else {
+                    saveState();
+                }
+                renderTasks();
+                updateProgress();
+            }, (error) => {
+                console.error("Firestore listener error:", error);
+                connectionStatus.innerHTML = `<div class="w-3 h-3 bg-red-500 rounded-full"></div><span class="text-sm font-medium text-red-600">Bağlantı Koptu</span>`;
+                connectionStatus.style.opacity = 1;
+            });
+        }
+
+        async function saveState() {
+            if (!checklistDocRef) return;
+            const stateToSave = [];
+            tasks.forEach(section => {
+                section.items.forEach(item => {
+                    stateToSave.push({ id: item.id, completed: item.completed });
+                    if (item.subItems) {
+                        item.subItems.forEach(subItem => {
+                            stateToSave.push({ id: subItem.id, completed: subItem.completed });
+                        });
+                    }
+                });
+            });
+            try {
+                await setDoc(checklistDocRef, { tasks: stateToSave });
+            } catch (error) {
+                console.error("Error saving state to Firestore:", error);
+            }
+        }
+
+        function updateProgress() {
+            let totalTasks = 0;
+            let completedTasks = 0;
+            tasks.forEach(section => {
+                section.items.forEach(item => {
+                    if (item.subItems) {
+                        totalTasks += item.subItems.length;
+                        completedTasks += item.subItems.filter(si => si.completed).length;
+                    } else {
+                        totalTasks++;
+                        if (item.completed) completedTasks++;
+                    }
+                });
+            });
+
+            const percentage = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+            progressBar.style.width = `${percentage}%`;
+            progressText.textContent = `${percentage}% (${completedTasks}/${totalTasks})`;
+        }
+
+        function handleTaskClick(item, isSubItem = false) {
+            item.completed = !item.completed;
+
+            if (isSubItem) {
+                tasks.forEach(section => {
+                    section.items.forEach(parentItem => {
+                        if (parentItem.subItems && parentItem.subItems.some(si => si.id === item.id)) {
+                            parentItem.completed = parentItem.subItems.every(si => si.completed);
+                        }
+                    });
+                });
+            }
+
+            if (!isSubItem && item.subItems) {
+                item.subItems.forEach(subItem => {
+                    subItem.completed = item.completed;
+                });
+            }
+            
+            renderTasks();
+            updateProgress();
+            saveState();
+        }
+
+        function renderTasks() {
+            taskListContainer.innerHTML = '';
+            tasks.forEach(section => {
+                const sectionDiv = document.createElement('div');
+                sectionDiv.innerHTML = `<div class="flex items-center border-b border-gray-200 pb-2 mb-4">${section.icon}<h2 class="text-xl font-semibold text-gray-700">${section.section}</h2></div>`;
+                const itemList = document.createElement('div');
+                itemList.className = 'space-y-3';
+
+                section.items.forEach(item => {
+                    const taskItemDiv = document.createElement('div');
+                    taskItemDiv.className = `task-item flex items-start p-2 rounded-lg ${item.completed ? 'completed' : ''}`;
+                    
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.checked = item.completed;
+                    checkbox.id = item.id;
+                    checkbox.addEventListener('click', () => handleTaskClick(item));
+                    
+                    const label = document.createElement('label');
+                    label.htmlFor = item.id;
+                    label.className = 'flex-grow cursor-pointer';
+
+                    const taskTextSpan = document.createElement('span');
+                    taskTextSpan.className = 'font-medium text-gray-800 task-text';
+                    taskTextSpan.textContent = item.text;
+                    
+                    label.appendChild(taskTextSpan);
+                    taskItemDiv.appendChild(checkbox);
+                    taskItemDiv.appendChild(label);
+                    
+                    itemList.appendChild(taskItemDiv);
+
+                    if (item.subItems) {
+                        item.subItems.forEach(subItem => {
+                            const subItemDiv = document.createElement('div');
+                            subItemDiv.className = `task-item sub-item flex items-start p-2 rounded-lg ${subItem.completed ? 'completed' : ''}`;
+                            const subCheckbox = document.createElement('input');
+                            subCheckbox.type = 'checkbox';
+                            subCheckbox.checked = subItem.completed;
+                            subCheckbox.id = subItem.id;
+                            subCheckbox.addEventListener('click', () => handleTaskClick(subItem, true));
+                            const subLabel = document.createElement('label');
+                            subLabel.htmlFor = subItem.id;
+                            subLabel.className = 'flex-grow cursor-pointer';
+                            const subTaskTextSpan = document.createElement('span');
+                            subTaskTextSpan.className = 'text-gray-600 task-text';
+                            subTaskTextSpan.textContent = subItem.text;
+                            subLabel.appendChild(subTaskTextSpan);
+                            subItemDiv.appendChild(subCheckbox);
+                            subItemDiv.appendChild(subLabel);
+                            itemList.appendChild(subItemDiv);
+                        });
+                    }
+                });
+                sectionDiv.appendChild(itemList);
+                taskListContainer.appendChild(sectionDiv);
+            });
+        }
+
+        // Uygulamayı başlat
+        setupFirebase();
+
+    </script>
+</body>
+</html>
