@@ -55,6 +55,12 @@
             width: 1.25rem;
             height: 1.25rem;
         }
+        /* DÜZELTME: Radio buton renkleri eklendi */
+        .radio-fe-done { accent-color: #22c55e; }
+        .radio-be-done { accent-color: #3b82f6; }
+        .radio-fe-awaiting-be { accent-color: #f97316; }
+        .radio-be-awaiting-fe { accent-color: #ca8a04; }
+
         .legend-item {
             display: flex;
             flex-direction: column;
@@ -82,6 +88,7 @@
             </div>
         </div>
 
+        <!-- Legend -->
         <div class="flex justify-end mb-4 px-2">
              <div class="radio-buttons">
                 <div class="legend-item" title="Frontend %100 Tamamlandı">
@@ -104,7 +111,8 @@
         </div>
 
         <div id="task-list" class="space-y-6">
-            </div>
+            <!-- Görevler buraya dinamik olarak eklenecek -->
+        </div>
     </div>
 
     <script type="module">
@@ -250,7 +258,6 @@
 
         async function setupFirebase() {
             try {
-                // Bu bilgiler bir önceki projeden kopyalandı.
                 const firebaseConfig = {
                     apiKey: "AIzaSyBkE1ZA4R8H8dtXzQK3_1f-ziASaqRWbNM",
                     authDomain: "checklist-44855.firebaseapp.com",
@@ -264,7 +271,6 @@
                 db = getFirestore(app);
                 const auth = getAuth(app);
                 
-                // Firestore'da bu proje için yeni bir döküman yolu
                 const docPath = `checklists/sertel_tms_yakit_revizyon_v1`;
                 checklistDocRef = doc(db, docPath);
 
@@ -298,12 +304,11 @@
                             if (savedItem && typeof savedItem.status === 'number') {
                                 item.status = savedItem.status;
                             } else {
-                                item.status = 0; // Varsayılan durum
+                                item.status = 0;
                             }
                         });
                     });
                 } else {
-                    // Döküman yoksa, mevcut durumu kaydet
                     saveState();
                 }
                 renderTasks();
@@ -358,23 +363,28 @@
 
                     taskWrapper.className = `task-item flex items-center p-2 rounded-lg hover:bg-gray-50 ${statusClass}`;
                     
+                    // DÜZELTME: Radio butonlara renk sınıfları eklendi
                     taskWrapper.innerHTML = `
                         <span class="flex-grow task-text font-medium text-gray-800">${item.text}</span>
                         <div class="radio-buttons">
-                            <input type="radio" name="status-${item.id}" value="1" title="Frontend %100 Tamamlandı" ${item.status === 1 ? 'checked' : ''}>
-                            <input type="radio" name="status-${item.id}" value="2" title="Backend %100 Tamamlandı" ${item.status === 2 ? 'checked' : ''}>
-                            <input type="radio" name="status-${item.id}" value="3" title="Frontend Tamamlandı, Backend Bekleniyor" ${item.status === 3 ? 'checked' : ''}>
-                            <input type="radio" name="status-${item.id}" value="4" title="Backend Tamamlandı, Frontend Bekleniyor" ${item.status === 4 ? 'checked' : ''}>
+                            <input type="radio" class="radio-fe-done" name="status-${item.id}" value="1" title="Frontend %100 Tamamlandı" ${item.status === 1 ? 'checked' : ''}>
+                            <input type="radio" class="radio-be-done" name="status-${item.id}" value="2" title="Backend %100 Tamamlandı" ${item.status === 2 ? 'checked' : ''}>
+                            <input type="radio" class="radio-fe-awaiting-be" name="status-${item.id}" value="3" title="Frontend Tamamlandı, Backend Bekleniyor" ${item.status === 3 ? 'checked' : ''}>
+                            <input type="radio" class="radio-be-awaiting-fe" name="status-${item.id}" value="4" title="Backend Tamamlandı, Frontend Bekleniyor" ${item.status === 4 ? 'checked' : ''}>
                         </div>
                     `;
                     
+                    // DÜZELTME: Event listener 'change' yerine 'click' oldu ve mantık güncellendi
+                    const currentStatus = item.status;
                     taskWrapper.querySelectorAll('input[type="radio"]').forEach(radio => {
-                        radio.addEventListener('change', (e) => {
-                            // Eğer seçili olan radio'ya tekrar tıklanırsa, seçimi kaldır (başa dön)
-                            if (item.status === parseInt(e.target.value)) {
+                        radio.addEventListener('click', (e) => {
+                            const clickedValue = parseInt(e.target.value);
+                            // Eğer tıklanan buton zaten seçili olan butonsa, seçimi kaldır (status'u 0 yap)
+                            if (currentStatus === clickedValue) {
                                 handleStatusChange(item, 0);
                             } else {
-                                handleStatusChange(item, parseInt(e.target.value));
+                            // Değilse, yeni durumu ata
+                                handleStatusChange(item, clickedValue);
                             }
                         });
                     });
