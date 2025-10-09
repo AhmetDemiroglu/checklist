@@ -88,6 +88,35 @@
             </div>
         </div>
 
+        <!-- YENİ: İlerleme ve Özet Alanı -->
+        <div class="mb-8 px-2">
+            <!-- Ana İlerleme Çubuğu -->
+            <div class="flex justify-between items-center mb-2">
+                <span class="text-sm font-medium text-gray-600">Genel Tamamlanma Oranı</span>
+                <span id="progress-text" class="text-sm font-bold text-green-600">0%</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-3">
+                <div id="progress-bar" class="bg-green-500 h-3 rounded-full" style="width: 0%; transition: width 0.5s ease-in-out;"></div>
+            </div>
+            
+            <!-- Durum Özet Kartları -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4 text-center">
+                <div class="bg-green-50 p-3 rounded-lg">
+                    <div id="completed-count" class="text-2xl font-bold text-green-700">0</div>
+                    <div class="text-sm font-medium text-green-600">Tamamlandı</div>
+                </div>
+                <div class="bg-orange-50 p-3 rounded-lg">
+                    <div id="waiting-for-be-count" class="text-2xl font-bold text-orange-700">0</div>
+                    <div class="text-sm font-medium text-orange-600">BE Bekliyor (FE>BE)</div>
+                </div>
+                <div class="bg-yellow-50 p-3 rounded-lg">
+                    <div id="waiting-for-fe-count" class="text-2xl font-bold text-yellow-700">0</div>
+                    <div class="text-sm font-medium text-yellow-600">FE Bekliyor (BE>FE)</div>
+                </div>
+            </div>
+        </div>
+
+
         <!-- Legend -->
         <div class="flex justify-end mb-4 px-2">
              <div class="radio-buttons">
@@ -312,6 +341,7 @@
                     saveState();
                 }
                 renderTasks();
+                updateProgress(); // İlerleme çubuğunu güncelle
             }, (error) => {
                 console.error("Firestore listener error:", error);
                 const statusDiv = connectionStatus.querySelector('div');
@@ -339,8 +369,38 @@
         function handleStatusChange(item, newStatus) {
             item.status = newStatus;
             renderTasks();
+            updateProgress(); // İlerleme çubuğunu güncelle
             saveState();
         }
+
+        // YENİ: İlerleme çubuğu ve özet alanını güncelleyen fonksiyon
+        function updateProgress() {
+            const progressBar = document.getElementById('progress-bar');
+            const progressText = document.getElementById('progress-text');
+            const completedCountEl = document.getElementById('completed-count');
+            const waitingForBeCountEl = document.getElementById('waiting-for-be-count');
+            const waitingForFeCountEl = document.getElementById('waiting-for-fe-count');
+
+            if (!progressBar || !completedCountEl) return;
+
+            const allItems = tasks.flatMap(s => s.items);
+            const totalTasks = allItems.length;
+            if (totalTasks === 0) return;
+
+            const completedTasks = allItems.filter(item => item.status === 1 || item.status === 2).length;
+            const waitingForBeTasks = allItems.filter(item => item.status === 3).length;
+            const waitingForFeTasks = allItems.filter(item => item.status === 4).length;
+            
+            const percentage = Math.round((completedTasks / totalTasks) * 100);
+
+            progressBar.style.width = `${percentage}%`;
+            progressText.textContent = `${percentage}% (${completedTasks}/${totalTasks})`;
+
+            completedCountEl.textContent = completedTasks;
+            waitingForBeCountEl.textContent = waitingForBeTasks;
+            waitingForFeCountEl.textContent = waitingForFeTasks;
+        }
+
 
         function renderTasks() {
             taskListContainer.innerHTML = '';
@@ -363,7 +423,6 @@
 
                     taskWrapper.className = `task-item flex items-center p-2 rounded-lg hover:bg-gray-50 ${statusClass}`;
                     
-                    // DÜZELTME: Radio butonlara renk sınıfları eklendi
                     taskWrapper.innerHTML = `
                         <span class="flex-grow task-text font-medium text-gray-800">${item.text}</span>
                         <div class="radio-buttons">
@@ -374,16 +433,13 @@
                         </div>
                     `;
                     
-                    // DÜZELTME: Event listener 'change' yerine 'click' oldu ve mantık güncellendi
                     const currentStatus = item.status;
                     taskWrapper.querySelectorAll('input[type="radio"]').forEach(radio => {
                         radio.addEventListener('click', (e) => {
                             const clickedValue = parseInt(e.target.value);
-                            // Eğer tıklanan buton zaten seçili olan butonsa, seçimi kaldır (status'u 0 yap)
                             if (currentStatus === clickedValue) {
                                 handleStatusChange(item, 0);
                             } else {
-                            // Değilse, yeni durumu ata
                                 handleStatusChange(item, clickedValue);
                             }
                         });
