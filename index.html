@@ -71,7 +71,6 @@
             font-weight: 500;
         }
 
-        /* YENİ: Not bölümü için stiller */
         .note-section {
             max-height: 0;
             overflow: hidden;
@@ -123,7 +122,6 @@
                 </div>
             </div>
         </div>
-
 
         <!-- Legend -->
         <div class="flex justify-end mb-4 px-2">
@@ -283,6 +281,8 @@
         const connectionStatus = document.getElementById('connection-status');
         const connectionText = document.getElementById('connection-text');
 
+        let isDataLoadedFromFirebase = false; // Verinin yüklendiğini kontrol eden bayrak
+
         let db;  
         let checklistDocRef; 
 
@@ -326,6 +326,8 @@
                 connectionText.classList.add('text-gray-600');
                 connectionStatus.style.opacity = 1;
 
+                isDataLoadedFromFirebase = true; // Veri başarıyla okundu, artık kayıt yapılabilir.
+
                 if (docSnap.exists()) {
                     const savedTasks = docSnap.data().tasks || [];
                     tasks.forEach(section => {
@@ -359,8 +361,13 @@
 
         async function saveState() {
             if (!checklistDocRef) return;
+            // Güvenlik kontrolü. Eğer veri sunucudan hiç yüklenmediyse, üzerine yazmayı engelle.
+            if (!isDataLoadedFromFirebase) {
+                console.warn("Veri sunucudan yüklenmediği için kaydetme işlemi engellendi.");
+                return;
+            }
             const stateToSave = tasks.flatMap(section => 
-                section.items.map(item => ({ id: item.id, status: item.status, note: item.note || '' })) // Notu da kaydet
+                section.items.map(item => ({ id: item.id, status: item.status, note: item.note || '' }))
             );
             try {
                 await setDoc(checklistDocRef, { tasks: stateToSave });
@@ -403,7 +410,6 @@
             waitingForFeCountEl.textContent = waitingForFeTasks;
         }
 
-
         function renderTasks() {
             taskListContainer.innerHTML = '';
             tasks.forEach(section => {
@@ -427,7 +433,6 @@
                     const noteIcon = hasNote 
                         ? `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 5v8a2 2 0 01-2 2h-5l-5 4v-4H4a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2zM7 8H5v2h2V8zm2 0h2v2H9V8zm6 0h-2v2h2V8z" clip-rule="evenodd" /></svg>` 
                         : `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" /></svg>`;
-
 
                     const taskRowHTML = `
                         <div class="task-item flex items-center p-2 rounded-lg hover:bg-gray-50 ${statusClass}">
