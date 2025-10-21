@@ -1,459 +1,526 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="tr" class="scroll-smooth">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sertel Lojistik - Yakıt Modülü Revizyonları (Canlı)</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f8fafc;
-        }
-        .task-item .task-text {
-            transition: color 0.3s ease-in-out;
-        }
-        /* Frontend Bitti - Yeşil Çizgi */
-        .status-fe-done .task-text {
-            text-decoration: line-through;
-            text-decoration-color: #22c55e; /* green-500 */
-            text-decoration-thickness: 2px;
-            color: #4ade80; /* green-400 */
-        }
-        /* Backend Bitti - Mavi Çizgi */
-        .status-be-done .task-text {
-            text-decoration: line-through;
-            text-decoration-color: #3b82f6; /* blue-500 */
-            text-decoration-thickness: 2px;
-            color: #60a5fa; /* blue-400 */
-        }
-        /* FE Bitti, BE Bekleniyor - Turuncu Text */
-        .status-fe-awaiting-be .task-text {
-            color: #f97316; /* orange-500 */
-            font-weight: 500;
-        }
-        /* BE Bitti, FE Bekleniyor - Koyu Turuncu Text */
-        .status-be-awaiting-fe .task-text {
-            color: #ca8a04; /* yellow-600 */
-            font-weight: 500;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sertel Lojistik - Yakıt Modülü Revizyonları (Canlı)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root { --glow: 0 0 0 0 rgba(0,0,0,0); }
+    body { font-family: 'Inter', sans-serif; background-color: #f8fafc; transition: background-color 0.3s; }
+    .task-item .task-text { transition: color 0.3s ease-in-out; }
+    /* Durum Stilleri */
+    .status-fe-done .task-text { text-decoration: line-through; text-decoration-color: #22c55e; text-decoration-thickness: 2px; color: #4ade80; }
+    .status-be-done .task-text { text-decoration: line-through; text-decoration-color: #3b82f6; text-decoration-thickness: 2px; color: #60a5fa; }
+    .status-fe-awaiting-be .task-text { color: #f97316; font-weight: 500; }
+    .status-be-awaiting-fe .task-text { color: #ca8a04; font-weight: 500; }
+    /* Dark Mode Kontrast İyileştirmeleri */
+    .dark body { background-color:#0f172a; }
+    .dark .card { background-color:#1e293b; color:#cbd5e1; border-color: #334155; }
+    .dark .task-item:hover { background-color:#334155; }
+    .dark .text-gray-800 { color: #f1f5f9; }
+    .dark .text-gray-700 { color: #e2e8f0; }
+    .dark .text-gray-600 { color: #94a3b8; }
+    .dark .text-gray-500 { color: #64748b; }
+    .dark .border-gray-200 { border-color: #334155; }
+    .dark .bg-gray-50 { background-color: #334155; }
+    .dark .bg-slate-50 { background-color: #334155; }
 
-        #connection-status {
-            transition: opacity 0.5s;
-        }
-        .radio-buttons {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 0.5rem;
-            min-width: 280px; /* Butonların sıkışmasını önle */
-            margin-left: auto;
-            padding-left: 1rem;
-        }
-        .radio-buttons input {
-            cursor: pointer;
-            width: 1.25rem;
-            height: 1.25rem;
-        }
-        .radio-fe-done { accent-color: #22c55e; }
-        .radio-be-done { accent-color: #3b82f6; }
-        .radio-fe-awaiting-be { accent-color: #f97316; }
-        .radio-be-awaiting-fe { accent-color: #ca8a04; }
+    #connection-status { transition: opacity 0.5s; }
+    .radio-buttons { display: grid; grid-template-columns: repeat(4, minmax(2.5rem,1fr)); gap: .5rem; min-width: 240px; margin-left: auto; padding-left: .5rem; }
+    .radio-buttons input { cursor: pointer; width: 1.25rem; height: 1.25rem; }
+    .radio-fe-done { accent-color: #22c55e; }
+    .radio-be-done { accent-color: #3b82f6; }
+    .radio-fe-awaiting-be { accent-color: #f97316; }
+    .radio-be-awaiting-fe { accent-color: #ca8a04; }
 
-        .legend-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            font-size: 0.75rem;
-            line-height: 1rem;
-            color: #4b5563; /* gray-600 */
-            font-weight: 500;
-        }
+    .note-section { max-height: 0; overflow: hidden; transition: max-height .3s ease-out, padding .3s ease-out, background-color .2s; }
+    .note-section.show { max-height: 220px; padding-top: .5rem; padding-bottom: .75rem; }
+    .note-sticky-bar { position: sticky; bottom: 0; display:flex; justify-content: flex-end; align-items: center; gap:.5rem; background: linear-gradient(180deg, rgba(249,250,251,0), rgba(249,250,251,1) 40%); padding-top:.5rem; }
+    .dark .note-sticky-bar { background: linear-gradient(180deg, rgba(51,65,85,0), rgba(51,65,85,1) 40%); }
 
-        .note-section {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease-out, padding 0.3s ease-out;
-        }
-        .note-section.show {
-            max-height: 150px;
-            padding-top: 0.5rem;
-            padding-bottom: 0.75rem;
-        }
-    </style>
+    /* "Üzerinde Çalışılıyor" Vurgusu */
+    .working-ring { box-shadow: 0 0 0 3px rgba(139,92,246,.25), 0 0 0 6px rgba(139,92,246,.12); animation: pulseGlow 1.2s ease-in-out infinite; border-radius: .75rem; }
+    @keyframes pulseGlow { 0%{ box-shadow: 0 0 0 0 rgba(139,92,246,.35), 0 0 0 3px rgba(139,92,246,.12);} 50%{ box-shadow: 0 0 0 6px rgba(139,92,246,.25), 0 0 0 12px rgba(139,92,246,.08);} 100%{ box-shadow: 0 0 0 0 rgba(139,92,246,.0), 0 0 0 3px rgba(139,92,246,.0);} }
+    
+    #confetti-canvas { position: fixed; top: 0; right: 0; width: 100%; height: 100%; pointer-events: none; z-index: 40; }
+
+    /* Mobil uyum – satırları parçala */
+    @media (max-width: 640px){
+      .task-row { flex-direction: column; align-items: stretch; gap: .5rem; }
+      .radio-buttons { order: 3; grid-template-columns: repeat(4, 1fr); min-width: auto; padding-left: 0; }
+      .task-aux { order: 2; display:flex; align-items:center; gap:.5rem; }
+    }
+  </style>
 </head>
 <body class="p-4 sm:p-6 md:p-8">
-
-    <div class="max-w-7xl mx-auto bg-white rounded-2xl shadow-lg p-6 sm:p-8">
-        
-        <div class="flex items-center justify-between mb-6 border-b pb-4">
-            <div>
-                <h1 class="text-2xl sm:text-3xl font-bold text-gray-800">Sertel Lojistik - Yakıt Modülü Revizyonları</h1>
-                <p class="text-gray-500 mt-1">Geliştirme ve iyileştirme görevlerinin canlı takip listesi.</p>
-            </div>
-             <div id="connection-status" class="flex items-center space-x-2 opacity-0">
-                <div class="w-3 h-3 bg-red-500 rounded-full"></div>
-                <span id="connection-text" class="text-sm font-medium text-red-600">Bağlantı Kuruluyor...</span>
-            </div>
+  <canvas id="confetti-canvas"></canvas>
+  <div class="max-w-7xl mx-auto card bg-white rounded-2xl shadow-lg p-6 sm:p-8">
+    <div class="flex items-center justify-between mb-4 sm:mb-6 border-b border-gray-200 pb-3 sm:pb-4">
+      <div>
+        <h1 id="page-title" class="text-2xl sm:text-3xl font-bold text-gray-800">Sertel Lojistik - Yakıt Modülü Revizyonları</h1>
+        <p id="motto" class="text-gray-500 mt-1">Geliştirme ve iyileştirme görevlerinin canlı takip listesi.</p>
+      </div>
+      <div class="flex items-center gap-3">
+        <button id="dark-toggle" class="p-2 rounded-lg bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-600" title="Temayı Değiştir">
+            <svg id="theme-icon-sun" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.707.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm-.707 8.486a1 1 0 011.414 0l.707-.707a1 1 0 01-1.414-1.414l-.707.707zM3 11a1 1 0 100-2H2a1 1 0 100 2h1z" clip-rule="evenodd" /></svg>
+            <svg id="theme-icon-moon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 hidden" viewBox="0 0 20 20" fill="currentColor"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" /></svg>
+        </button>
+        <div id="connection-status" class="hidden sm:flex items-center space-x-2 opacity-0">
+          <div class="w-3 h-3 bg-red-500 rounded-full"></div>
+          <span id="connection-text" class="text-sm font-medium text-red-600">Bağlantı Kuruluyor...</span>
         </div>
-
-        <!-- İlerleme ve Özet Alanı -->
-        <div class="mb-8 px-2">
-            <div class="flex justify-between items-center mb-2">
-                <span class="text-sm font-medium text-gray-600">Genel Tamamlanma Oranı</span>
-                <span id="progress-text" class="text-sm font-bold text-green-600">0%</span>
-            </div>
-            <div class="w-full bg-gray-200 rounded-full h-3">
-                <div id="progress-bar" class="bg-green-500 h-3 rounded-full" style="width: 0%; transition: width 0.5s ease-in-out;"></div>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4 text-center">
-                <div class="bg-green-50 p-3 rounded-lg">
-                    <div id="completed-count" class="text-2xl font-bold text-green-700">0</div>
-                    <div class="text-sm font-medium text-green-600">Tamamlandı</div>
-                </div>
-                <div class="bg-orange-50 p-3 rounded-lg">
-                    <div id="waiting-for-be-count" class="text-2xl font-bold text-orange-700">0</div>
-                    <div class="text-sm font-medium text-orange-600">Backend Bekleniyor</div>
-                </div>
-                <div class="bg-yellow-50 p-3 rounded-lg">
-                    <div id="waiting-for-fe-count" class="text-2xl font-bold text-yellow-700">0</div>
-                    <div class="text-sm font-medium text-yellow-600">Frontend Bekleniyor</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Legend -->
-        <div class="mb-6 p-3 border rounded-lg bg-gray-50 flex items-center justify-center flex-wrap gap-x-6 gap-y-2 text-xs text-gray-700">
-            <span class="font-bold text-gray-800">GÖSTERGE:</span>
-            <div class="flex items-center space-x-2">
-                <div class="w-3 h-3 rounded-full bg-green-500"></div>
-                <span>FE Bitti</span>
-            </div>
-            <div class="flex items-center space-x-2">
-                <div class="w-3 h-3 rounded-full bg-blue-500"></div>
-                <span>BE Bitti</span>
-            </div>
-            <div class="flex items-center space-x-2">
-                <div class="w-3 h-3 rounded-full bg-orange-500"></div>
-                <span>BE Bekleniyor</span>
-            </div>
-            <div class="flex items-center space-x-2">
-                <div class="w-3 h-3 rounded-full bg-yellow-600"></div>
-                <span>FE Bekleniyor</span>
-            </div>
-        </div>
-
-        <div id="task-list" class="space-y-6">
-            <!-- Görevler buraya dinamik olarak eklenecek -->
-        </div>
+      </div>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    <!-- Genel Notlar (Collapse) -->
+    <details id="bulk-notes" class="mb-4 sm:mb-6 rounded-lg border border-gray-200 bg-gray-50">
+      <summary class="cursor-pointer select-none px-3 py-2 sm:px-4 sm:py-3 text-sm sm:text-base font-semibold text-gray-700">Genel Notlar</summary>
+      <div class="p-3 sm:p-4 space-y-3">
+        <div class="flex items-center justify-between"><span class="text-xs sm:text-sm text-gray-500">Görev notlarının özet görünümü</span></div>
+        <div id="notes-summary" class="space-y-2 text-sm"></div>
+        <div class="border-t border-gray-200 pt-3">
+          <label class="block text-xs text-gray-500 mb-1">Paylaşımlı Not Ekle:</label>
+          <div class="flex gap-2">
+            <input id="board-note-input" class="flex-1 rounded border border-gray-300 px-2 py-1 text-sm" placeholder="Kısa not..." />
+            <button id="board-note-add" class="text-xs px-3 py-1 rounded bg-blue-600 text-white hover:bg-blue-700">Ekle</button>
+          </div>
+          <ul id="board-notes-list" class="mt-2 space-y-1 text-xs"></ul>
+        </div>
+      </div>
+    </details>
 
-        const tasks = [
-            {
-                section: "Genel Maddeler",
-                items: [
-                    { id: 'gm_1', text: 'Total ve Petrol Ofisi ekranları “Yakıt Modülü” altına taşınacak.', status: 0 },
-                    { id: 'gm_2', text: 'Excel çıktıları alınamıyor.', status: 0 },
-                    { id: 'gm_3', text: 'Plaka seçimlerinde çekici ve treyler plakaları ayrıştırılsın.', status: 0 },
-                    { id: 'gm_4', text: 'Placeholder değeri “0” olan alanlar tıklandığında “0” değeri otomatik olarak kaybolmalı.', status: 0 },
-                    { id: 'gm_5', text: 'Miktar ve km girilen alanlarda 3 basamaktan sonra otomatik olarak nokta gösterimi aktif hale getirilsin.', status: 0 },
-                    { id: 'gm_6', text: 'Filtreler seçilmedikçe hiçbir filtre uygulanmasın.', status: 0 },
-                    { id: 'gm_7', text: 'İsim listelerinde alfabetik sıralama sağlansın.', status: 0 },
-                ]
-            },
-            {
-                section: "Depo Hareketleri",
-                items: [
-                    { id: 'dh_1', text: 'İkonların düzeni karışık görünüyor.', status: 0 },
-                    { id: 'dh_2', text: 'AdBlue ve Motorin için ayrı bir sütun eklenmeli ve bu alanda filtreleme yapılabilmeli.', status: 0 },
-                ]
-            },
-            {
-                section: "Yakıt Girişi",
-                items: [
-                    { id: 'yg_1', text: 'Bazı siparişlerde depo isimleri eksik geliyor. (Örnek: 111111 nolu sipariş)', status: 0 },
-                    { id: 'yg_2', text: 'Zorunlu alanlar “*” işaretiyle gösterilsin.', status: 0 },
-                    { id: 'yg_3', text: 'Kapasite aşımında uyarıya rağmen kayıt tabloya işleniyor (gerçek dolum olmasa da).', status: 0 },
-                    { id: 'yg_4', text: 'Yakıt girişi yapılırken teslim alan kişiye sms doğrulaması gelmeli.', status: 0 },
-                ]
-            },
-            {
-                section: "Yakıt Tedarikçileri",
-                items: [
-                    { id: 'yt_1', text: 'Bread Crumbs yolu eski ekrana göre kalmış, güncellenmeli.', status: 0 },
-                ]
-            },
-            {
-                section: "Akaryakıt Depoları",
-                items: [
-                    { id: 'ad_1', text: '“Çalışanları Yönet” kısmında isimler listelenmiyor.', status: 0 },
-                    { id: 'ad_2', text: 'Arama büyük/küçük harf duyarlı olmamalı ("ALİ" ve "ali" aynı sonucu vermeli).', status: 0 },
-                    { id: 'ad_3', text: 'Düzenleme ekranındaki “Güncelle” butonu çalışmıyor.', status: 0 },
-                ]
-            },
-            {
-                section: "Entegre Depo Sınıfı",
-                items: [
-                    { id: 'eds_1', text: 'Hâlen boş kayıt oluşturulabiliyor.', status: 0 },
-                ]
-            },
-            {
-                section: "Depo Sınıfı",
-                items: [
-                    { id: 'ds_1', text: 'Depo sınıfında “Şube Bilgisi” alanı eklenmeli.', status: 0 },
-                ]
-            },
-            {
-                section: "Yakıt Çıkışı Veri Giriş Ekranı",
-                items: [
-                    { id: 'ycve_1', text: '“Araç Klima Güncel Sayaç” alanı yukarı taşınsın. Treyler plakası seçilirse aktif gelsin.', status: 0 },
-                    { id: 'ycve_2', text: 'Çekici ve treyler plakaları aynı anda seçilemesin; plakalar türüne göre listelensin.', status: 0 },
-                ]
-            },
-            {
-                section: "Sipariş Veri İşleme Formu",
-                items: [
-                    { id: 'svif_1', text: '“Göz göz yakıt giriş alanı” veri işleme formunda hâlen uygulanmamış.', status: 0 },
-                    { id: 'svif_2', text: 'Bread Crumbs yolu eski ekrana göre kalmış, güncellenmeli.', status: 0 },
-                    { id: 'svif_3', text: 'Kantar tarihleri ilgili sipariş tarihinden öncesi seçilemesin.', status: 0 },
-                    { id: 'svif_4', text: 'Kantar ölçümündeki mavi toplam kartlarının sayı görünümü düzeltilmeli.', status: 0 },
-                ]
-            },
-            {
-                section: "Yakıt Çıkış Raporları",
-                items: [
-                    { id: 'ycr_1', text: '“Görev Yeri” sütunu halen bulunmuyor.', status: 0 },
-                ]
+    <!-- Özet Satırı -->
+    <div class="mb-6 px-2">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2">
+        <span id="session-line" class="text-sm font-medium text-gray-600">Başlıyoruz…</span>
+        <span class="text-sm font-bold text-green-600"><span id="progress-text">0%</span></span>
+      </div>
+      <div class="w-full bg-gray-200 rounded-full h-3">
+        <div id="progress-bar" class="bg-green-500 h-3 rounded-full" style="width: 0%; transition: width .5s ease-in-out;"></div>
+      </div>
+    </div>
+    
+    <!-- Filtreler -->
+    <div class="mb-5 flex flex-wrap justify-center items-center gap-2 p-2 rounded-lg bg-gray-100 dark:bg-slate-800 text-xs">
+        <span class="font-semibold text-gray-700 dark:text-slate-300 mr-2">Filtrele:</span>
+        <button data-filter="all" class="filter-btn px-2 py-1 rounded bg-slate-800 text-white">Tümü</button>
+        <button data-filter="1" class="filter-btn px-2 py-1 rounded bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300">FE Bitti</button>
+        <button data-filter="2" class="filter-btn px-2 py-1 rounded bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300">BE Bitti</button>
+        <button data-filter="3" class="filter-btn px-2 py-1 rounded bg-orange-100 text-orange-800 dark:bg-orange-900/50 dark:text-orange-300">BE Bekleniyor</button>
+        <button data-filter="4" class="filter-btn px-2 py-1 rounded bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300">FE Bekleniyor</button>
+        <button data-filter="working" class="filter-btn px-2 py-1 rounded bg-violet-100 text-violet-800 dark:bg-violet-900/50 dark:text-violet-300">Çalışılanlar</button>
+    </div>
+
+
+    <div id="task-list" class="space-y-6"></div>
+
+    <!-- Son Değişiklikler Şeridi -->
+    <div class="mt-6 pt-3 border-t border-gray-200">
+      <div id="recent-strip" class="flex flex-wrap gap-2"></div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    // ---------- Yardımcılar ----------
+    const $ = (s, d=document) => d.querySelector(s);
+    const $$ = (s, d=document) => Array.from(d.querySelectorAll(s));
+    const isToday = (dt)=>{ const t=new Date(); return dt.getDate()===t.getDate() && dt.getMonth()===t.getMonth() && dt.getFullYear()===t.getFullYear(); };
+    const pad2 = (n)=> String(n).padStart(2,'0');
+    const formatTimeTR = (date)=> `${pad2(date.getHours())}:${pad2(date.getMinutes())}`;
+    const humanizeSince = (ts)=>{
+      if(!ts) return '';
+      const now = Date.now();
+      const diff = Math.max(0, now - ts);
+      const mins = Math.floor(diff/60000);
+      if(mins < 1) return 'az önce';
+      if(mins < 60) return `${mins} dk önce`;
+      const hrs = Math.floor(mins/60);
+      if(isToday(new Date(ts))) return `Bugün ${formatTimeTR(new Date(ts))}`;
+      return new Date(ts).toLocaleString('tr-TR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
+    };
+
+    // ---------- Veri ----------
+    const tasks = [
+        { section: "Genel Maddeler", items: [
+            { id:'gm_1', text:'Total ve Petrol Ofisi ekranları “Yakıt Modülü” altına taşınacak.', status:0 },
+            { id:'gm_2', text:'Excel çıktıları alınamıyor.', status:0 },
+            { id:'gm_3', text:'Plaka seçimlerinde çekici ve treyler plakaları ayrıştırılsın.', status:0 },
+            { id:'gm_4', text:'Placeholder değeri “0” olan alanlar tıklandığında “0” değeri otomatik olarak kaybolmalı.', status:0 },
+            { id:'gm_5', text:'Miktar ve km girilen alanlarda 3 basamaktan sonra otomatik olarak nokta gösterimi aktif hale getirilsin.', status:0 },
+            { id:'gm_6', text:'Filtreler seçilmedikçe hiçbir filtre uygulanmasın.', status:0 },
+            { id:'gm_7', text:'İsim listelerinde alfabetik sıralama sağlansın.', status:0 },
+        ]},
+        { section: "Depo Hareketleri", items: [
+            { id:'dh_1', text:'İkonların düzeni karışık görünüyor.', status:0 },
+            { id:'dh_2', text:'AdBlue ve Motorin için ayrı bir sütun eklenmeli ve bu alanda filtreleme yapılabilmeli.', status:0 },
+        ]},
+        { section: "Yakıt Girişi", items: [
+            { id:'yg_1', text:'Bazı siparişlerde depo isimleri eksik geliyor. (Örnek: 111111 nolu sipariş)', status:0 },
+            { id:'yg_2', text:'Zorunlu alanlar “*” işaretiyle gösterilsin.', status:0 },
+            { id:'yg_3', text:'Kapasite aşımında uyarıya rağmen kayıt tabloya işleniyor (gerçek dolum olmasa da).', status:0 },
+            { id:'yg_4', text:'Yakıt girişi yapılırken teslim alan kişiye sms doğrulaması gelmeli.', status:0 },
+        ]},
+        { section: "Yakıt Tedarikçileri", items: [
+            { id:'yt_1', text:'Bread Crumbs yolu eski ekrana göre kalmış, güncellenmeli.', status:0 },
+        ]},
+        { section: "Akaryakıt Depoları", items: [
+            { id:'ad_1', text:'“Çalışanları Yönet” kısmında isimler listelenmiyor.', status:0 },
+            { id:'ad_2', text:'Arama büyük/küçük harf duyarlı olmamalı ("ALİ" ve "ali" aynı sonucu vermeli).', status:0 },
+            { id:'ad_3', text:'Düzenleme ekranındaki “Güncelle” butonu çalışmıyor.', status:0 },
+        ]},
+        { section: "Entegre Depo Sınıfı", items: [
+            { id:'eds_1', text:'Hâlen boş kayıt oluşturulabiliyor.', status:0 },
+        ]},
+        { section: "Depo Sınıfı", items: [
+            { id:'ds_1', text:'Depo sınıfında “Şube Bilgisi” alanı eklenmeli.', status:0 },
+        ]},
+        { section: "Yakıt Çıkışı Veri Giriş Ekranı", items: [
+            { id:'ycve_1', text:'“Araç Klima Güncel Sayaç” alanı yukarı taşınsın. Treyler plakası seçilirse aktif gelsin.', status:0 },
+            { id:'ycve_2', text:'Çekici ve treyler plakaları aynı anda seçilemesin; plakalar türüne göre listelensin.', status:0 },
+        ]},
+        { section: "Sipariş Veri İşleme Formu", items: [
+            { id:'svif_1', text:'“Göz göz yakıt giriş alanı” veri işleme formunda hâlen uygulanmamış.', status:0 },
+            { id:'svif_2', text:'Bread Crumbs yolu eski ekrana göre kalmış, güncellenmeli.', status:0 },
+            { id:'svif_3', text:'Kantar tarihleri ilgili sipariş tarihinden öncesi seçilemesin.', status:0 },
+            { id:'svif_4', text:'Kantar ölçümündeki mavi toplam kartlarının sayı görünümü düzeltilmeli.', status:0 },
+        ]},
+        { section: "Yakıt Çıkış Raporları", items: [
+            { id:'ycr_1', text:'“Görev Yeri” sütunu halen bulunmuyor.', status:0 },
+        ]},
+    ];
+
+    // Firebase
+    let db; let checklistDocRef; let isDataLoadedFromFirebase = false;
+    const firebaseConfig = { apiKey:"AIzaSyBkE1ZA4R8H8dtXzQK3_1f-ziASaqRWbNM", authDomain:"checklist-44855.firebaseapp.com", projectId:"checklist-44855", storageBucket:"checklist-44855.firebasestorage.app", messagingSenderId:"287422053970", appId:"1:287422053970:web:0f47ebb4fa2e98aba0298b" };
+
+    // UI refs
+    const taskListContainer = $('#task-list');
+    const connectionStatus = $('#connection-status');
+    const connectionText = $('#connection-text');
+
+    // Durum
+    let activeFilter = 'all';
+    const recentTouched = []; // {id, label, ts}
+    let boardNotes = [];
+
+    function bumpRecent(item, label){
+      const existing = recentTouched.findIndex(x=>x.id===item.id);
+      if(existing>-1) recentTouched.splice(existing,1);
+      recentTouched.unshift({ id:item.id, label, ts:Date.now() });
+      if(recentTouched.length>3) recentTouched.pop();
+      renderRecentStrip();
+    }
+
+    function renderRecentStrip(){
+      const holder = $('#recent-strip');
+      holder.innerHTML = '';
+      recentTouched.forEach(r=>{
+        const pill = document.createElement('span');
+        pill.className = 'px-2 py-1 text-xs rounded-full bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 cursor-pointer hover:bg-slate-300';
+        pill.textContent = `${r.label} • ${humanizeSince(r.ts)}`;
+        pill.onclick = () => {
+            const el = $(`[data-task-id="${r.id}"]`);
+            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        };
+        holder.appendChild(pill);
+      })
+    }
+
+    function updateSessionLine(){
+      const all = tasks.flatMap(s=>s.items);
+      const completed = all.filter(i=>i.status===1||i.status===2).length;
+      $('#session-line').textContent = `Toplam ${all.length} görevden ${completed} tanesi tamamlandı.`;
+    }
+
+    async function setupFirebase(){
+      try{
+        const app = initializeApp(firebaseConfig);
+        db = getFirestore(app);
+        const auth = getAuth(app);
+        checklistDocRef = doc(db, 'checklists/sertel_tms_yakit_revizyon_v2');
+        await signInAnonymously(auth);
+        listenForUpdates();
+      }catch(err){
+        console.error(err);
+        connectionStatus.classList.remove('hidden');
+        connectionStatus.style.opacity = 1; connectionText.textContent = 'Bağlantı hatası. Ortak çalışma devre dışı.';
+        renderTasks();
+      }
+    }
+
+    function listenForUpdates(){
+      onSnapshot(checklistDocRef, (docSnap)=>{
+        connectionStatus.classList.remove('hidden');
+        const statusDiv = connectionStatus.querySelector('div');
+        statusDiv.classList.remove('bg-red-500');
+        statusDiv.classList.add('bg-green-500','animate-pulse');
+        connectionText.textContent = 'Canlı Bağlantı Aktif';
+        connectionText.classList.remove('text-red-600');
+        connectionText.classList.add('text-gray-600', 'dark:text-slate-300');
+        connectionStatus.style.opacity = 1;
+
+        isDataLoadedFromFirebase = true;
+        const data = docSnap.data() || {};
+        const savedTasks = data.tasks || [];
+        boardNotes = data.boardNotes || [];
+
+        tasks.forEach(section=>{
+          section.items.forEach(item=>{
+            const saved = savedTasks.find(t=>t.id===item.id);
+            if(saved){
+              item.status = typeof saved.status==='number'? saved.status : 0;
+              item.note = saved.note || '';
+              item.working = !!saved.working;
+              item.lastUpdated = saved.lastUpdated || 0;
+              item.noteUpdated = saved.noteUpdated || 0;
             }
-        ];
+          })
+        })
 
-        // --- UYGULAMA MANTIĞI ---
-        const taskListContainer = document.getElementById('task-list');
-        const connectionStatus = document.getElementById('connection-status');
-        const connectionText = document.getElementById('connection-text');
+        renderBoardNotes();
+        renderTasks();
+        updateProgress();
+        updateSessionLine();
+      }, (error)=>{
+        console.error('Firestore listener error:', error);
+        const statusDiv = connectionStatus.querySelector('div');
+        statusDiv.classList.add('bg-red-500');
+        statusDiv.classList.remove('bg-green-500','animate-pulse');
+        connectionText.textContent = 'Bağlantı Koptu';
+        connectionText.classList.add('text-red-600');
+        connectionStatus.style.opacity = 1;
+      })
+    }
 
-        let isDataLoadedFromFirebase = false; // Verinin yüklendiğini kontrol eden bayrak
+    async function saveState(){
+      if(!checklistDocRef || !isDataLoadedFromFirebase) return;
+      const stateToSave = tasks.flatMap(section => section.items.map(item => ({
+        id:item.id, status:item.status||0, note:item.note||'', working:!!item.working, lastUpdated:item.lastUpdated||0, noteUpdated:item.noteUpdated||0
+      })));
+      try{ await setDoc(checklistDocRef, { tasks: stateToSave, boardNotes }, { merge:true }); }catch(e){ console.error('Error saving state', e); }
+    }
 
-        let db;  
-        let checklistDocRef; 
+    function handleStatusChange(item, newStatus){
+      const old = item.status;
+      item.status = newStatus;
+      item.lastUpdated = Date.now();
+      bumpRecent(item, item.label || item.id);
+      renderTasks(); updateProgress(); updateSessionLine(); saveState();
+      if((newStatus===1 || newStatus===2) && !(old===1||old===2)) confetti(600);
+    }
 
-        async function setupFirebase() {
-            try {
-                const firebaseConfig = {
-                    apiKey: "AIzaSyBkE1ZA4R8H8dtXzQK3_1f-ziASaqRWbNM",
-                    authDomain: "checklist-44855.firebaseapp.com",
-                    projectId: "checklist-44855",
-                    storageBucket: "checklist-44855.firebasestorage.app",
-                    messagingSenderId: "287422053970",
-                    appId: "1:287422053970:web:0f47ebb4fa2e98aba0298b"
-                };
+    function updateProgress(){
+      const all = tasks.flatMap(s=>s.items); const total = all.length; if(!total) return;
+      const completed = all.filter(i=>i.status===1 || i.status===2).length;
+      const pct = Math.round((completed/total)*100);
+      $('#progress-bar').style.width = pct+'%';
+      $('#progress-text').textContent = `${pct}%`;
+    }
 
-                const app = initializeApp(firebaseConfig);
-                db = getFirestore(app);
-                const auth = getAuth(app);
-                
-                const docPath = `checklists/sertel_tms_yakit_revizyon_v2`; // Döküman yolunu yeni liste için güncelledim.
-                checklistDocRef = doc(db, docPath);
+    function renderBoardNotes(){
+      const list = $('#board-notes-list'); list.innerHTML='';
+      boardNotes.forEach((n, index)=>{
+        const li = document.createElement('li');
+        li.className='flex items-center justify-between gap-2';
+        const when = humanizeSince(n.ts);
+        li.innerHTML = `
+            <div class="flex items-center gap-2">
+                <span class="px-2 py-1 rounded bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-100">${n.text}</span>
+                <span class="text-[10px] text-slate-500">${when}</span>
+            </div>
+            <button data-index="${index}" class="delete-note-btn text-slate-400 hover:text-red-500 p-1 rounded-full">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        `;
+        list.appendChild(li);
+      });
+    }
 
-                await signInAnonymously(auth);
-                
-                listenForUpdates();
+    function renderTasks(){
+      taskListContainer.innerHTML = '';
+      tasks.forEach((section, sIdx)=>{
+        const sectionDiv = document.createElement('div');
+        const sectionNumber = sIdx+1;
+        sectionDiv.innerHTML = `<h2 class="text-xl font-semibold text-gray-700 border-b border-gray-200 pb-2 mb-3">${sectionNumber}. ${section.section}</h2>`;
+        const itemList = document.createElement('div'); itemList.className='space-y-1';
 
-            } catch (error) {
-                console.error("Firebase initialization error:", error);
-                connectionStatus.style.opacity = 1;
-                connectionText.textContent = `Bağlantı hatası. Ortak çalışma özelliği devre dışı.`;
-                renderTasks();
-            }
-        }
+        section.items.forEach((item, iIdx)=>{
+          const letter = String.fromCharCode(97 + iIdx);
+          const displayLabel = letter;
+          item.label = `${sectionNumber}.${letter}`;
+          const matchByFilter = (it)=>{
+            if(activeFilter==='all') return true;
+            if(activeFilter==='working') return !!it.working;
+            return String(it.status)===String(activeFilter);
+          };
+          if(!matchByFilter(item)) return;
 
-        function listenForUpdates() {
-            onSnapshot(checklistDocRef, (docSnap) => {
-                const statusDiv = connectionStatus.querySelector('div');
-                statusDiv.classList.remove('bg-red-500');
-                statusDiv.classList.add('bg-green-500', 'animate-pulse');
-                connectionText.textContent = 'Canlı Bağlantı Aktif';
-                connectionText.classList.remove('text-red-600');
-                connectionText.classList.add('text-gray-600');
-                connectionStatus.style.opacity = 1;
+          const container = document.createElement('div');
+          container.setAttribute('data-task-id', item.id);
+          const statusClass = item.status===1? 'status-fe-done' : item.status===2? 'status-be-done' : item.status===3? 'status-fe-awaiting-be' : item.status===4? 'status-be-awaiting-fe' : '';
+          const workingClass = item.working? 'working-ring' : '';
 
-                isDataLoadedFromFirebase = true; // Veri başarıyla okundu, artık kayıt yapılabilir.
+          const infoBadge = item.lastUpdated ? `<span class="badge-updated text-[10px] px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-600 text-slate-600 dark:text-slate-300">${humanizeSince(item.lastUpdated)}</span>` : '';
+          const workingBadge = item.working ? `<span class="text-[10px] px-2 py-0.5 rounded-full bg-violet-100 dark:bg-violet-900/50 text-violet-700 dark:text-violet-300">Çalışılıyor</span>` : '';
 
-                if (docSnap.exists()) {
-                    const savedTasks = docSnap.data().tasks || [];
-                    tasks.forEach(section => {
-                        section.items.forEach(item => {
-                            const savedItem = savedTasks.find(t => t.id === item.id);
-                            if (savedItem && typeof savedItem.status === 'number') {
-                                item.status = savedItem.status;
-                                item.note = savedItem.note || ''; // Notu al
-                            } else {
-                                item.status = 0;
-                                item.note = '';
-                            }
-                        });
-                    });
-                } else {
-                    saveState();
-                }
-                renderTasks();
-                updateProgress();
-            }, (error) => {
-                console.error("Firestore listener error:", error);
-                const statusDiv = connectionStatus.querySelector('div');
-                statusDiv.classList.add('bg-red-500');
-                statusDiv.classList.remove('bg-green-500', 'animate-pulse');
-                connectionText.textContent = 'Bağlantı Koptu';
-                connectionText.classList.add('text-red-600');
-                connectionText.classList.remove('text-gray-600');
-                connectionStatus.style.opacity = 1;
-            });
-        }
+          container.className = `task-item ${statusClass} ${workingClass} p-2 rounded-lg hover:bg-gray-50`;
+          container.innerHTML = `
+            <div class="task-row flex items-center gap-2">
+              <span class="task-text font-medium text-gray-800 flex-1">
+                <b class="text-gray-500 mr-2">${displayLabel}.</b>${item.text}
+              </span>
+              <div class="task-aux flex items-center gap-2">
+                ${infoBadge}
+                ${workingBadge}
+              </div>
+              <div class="radio-buttons">
+                <div class="flex justify-center"><input type="radio" class="radio-fe-done" name="status-${item.id}" value="1" title="Frontend %100 Tamamlandı" ${item.status===1?'checked':''}></div>
+                <div class="flex justify-center"><input type="radio" class="radio-be-done" name="status-${item.id}" value="2" title="Backend %100 Tamamlandı" ${item.status===2?'checked':''}></div>
+                <div class="flex justify-center"><input type="radio" class="radio-fe-awaiting-be" name="status-${item.id}" value="3" title="Frontend Tamamlandı, Backend Bekleniyor" ${item.status===3?'checked':''}></div>
+                <div class="flex justify-center"><input type="radio" class="radio-be-awaiting-fe" name="status-${item.id}" value="4" title="Backend Tamamlandı, Frontend Bekleniyor" ${item.status===4?'checked':''}></div>
+              </div>
+              <button class="note-toggle-btn ml-2 text-gray-400 hover:text-blue-600 p-1 rounded-full" title="Not Ekle/Aç">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" /></svg>
+              </button>
+            </div>
+            <div class="mt-1 flex items-center gap-2 text-[11px] text-slate-500 dark:text-slate-400">
+              <label class="inline-flex items-center gap-1 cursor-pointer select-none"><input type="checkbox" class="working-toggle accent-violet-600" ${item.working?'checked':''}/> Üzerinde çalışılıyor</label>
+            </div>
+          `;
 
-        async function saveState() {
-            if (!checklistDocRef) return;
-            // Güvenlik kontrolü. Eğer veri sunucudan hiç yüklenmediyse, üzerine yazmayı engelle.
-            if (!isDataLoadedFromFirebase) {
-                console.warn("Veri sunucudan yüklenmediği için kaydetme işlemi engellendi.");
-                return;
-            }
-            const stateToSave = tasks.flatMap(section => 
-                section.items.map(item => ({ id: item.id, status: item.status, note: item.note || '' }))
-            );
-            try {
-                await setDoc(checklistDocRef, { tasks: stateToSave });
-            } catch (error) {
-                console.error("Error saving state to Firestore:", error);
-            }
-        }
-        
-        function handleStatusChange(item, newStatus) {
-            item.status = newStatus;
-            renderTasks();
-            updateProgress();
+          const noteSection = document.createElement('div');
+          noteSection.className = 'note-section bg-gray-50 rounded-b-lg px-4';
+          const lastNote = item.noteUpdated ? `<span class="text-[10px] text-slate-500">Son kaydetme: ${humanizeSince(item.noteUpdated)}</span>` : '';
+          noteSection.innerHTML = `
+            <textarea class="w-full p-2 border border-gray-300 rounded-md text-sm mt-2" placeholder="Notunuzu buraya ekleyin...">${item.note || ''}</textarea>
+            <div class="note-sticky-bar my-2">
+              <div class="mr-auto">${lastNote}</div>
+              <button class="note-save-btn text-sm bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600">Kaydet</button>
+            </div>
+          `;
+
+          container.querySelectorAll('input[type="radio"]').forEach(r=>{
+            r.addEventListener('click', (e)=>{
+              const clicked = parseInt(e.target.value);
+              const current = item.status;
+              if(current===clicked){ handleStatusChange(item, 0); } else { handleStatusChange(item, clicked); }
+            })
+          })
+
+          container.querySelector('.note-toggle-btn').addEventListener('click', ()=>{
+            noteSection.classList.toggle('show');
+          })
+
+          const workingToggle = container.querySelector('.working-toggle');
+          workingToggle.addEventListener('change', ()=>{
+            item.working = workingToggle.checked; item.lastUpdated = Date.now();
+            bumpRecent(item, item.label);
+            renderTasks(); saveState(); updateSessionLine();
+          })
+
+          noteSection.querySelector('.note-save-btn').addEventListener('click', ()=>{
+            const v = noteSection.querySelector('textarea').value;
+            item.note = v; item.noteUpdated = Date.now();
             saveState();
+            const info = noteSection.querySelector('.note-sticky-bar .mr-auto');
+            info.innerHTML = `<span class="text-[10px] text-slate-500">Son kaydetme: ${humanizeSince(item.noteUpdated)}</span>`;
+            item.lastUpdated = Date.now(); bumpRecent(item, item.label); renderTasks();
+          })
+
+          itemList.appendChild(container);
+          itemList.appendChild(noteSection);
+        })
+
+        sectionDiv.appendChild(itemList);
+        taskListContainer.appendChild(sectionDiv);
+      })
+
+      $$('.filter-btn').forEach(b=>{
+        b.classList.toggle('ring-2', b.dataset.filter===String(activeFilter));
+        b.classList.toggle('ring-blue-500', b.dataset.filter===String(activeFilter));
+      })
+    }
+
+    // Confetti
+    function confetti(durationMs=600){
+      const canvas = $('#confetti-canvas');
+      const ctx = canvas.getContext('2d');
+      const W = canvas.width = window.innerWidth; const H = canvas.height = window.innerHeight;
+      const N = 80; const parts = Array.from({length:N}, ()=>({
+        x: W - 20 + Math.random()*20, y: 0, vx: - (1+Math.random()*3), vy: 2+Math.random()*3, s: 2+Math.random()*3, a: 1
+      }));
+      let start = performance.now();
+      function step(t){
+        const dt = t - start; ctx.clearRect(0,0,W,H);
+        parts.forEach(p=>{ p.x+=p.vx; p.y+=p.vy; p.a-=0.01; ctx.globalAlpha=Math.max(0,p.a); ctx.fillStyle=['#22c55e','#3b82f6','#f97316','#ca8a04'][Math.floor(Math.random()*4)]; ctx.fillRect(p.x,p.y,p.s,p.s); });
+        if(dt < durationMs){ requestAnimationFrame(step); } else { ctx.clearRect(0,0,W,H); }
+      }
+      requestAnimationFrame(step);
+    }
+
+    // Filtreler
+    $$('.filter-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=>{ activeFilter = btn.dataset.filter; renderTasks(); });
+    })
+
+    // Genel Notlar
+    $('#board-note-add').addEventListener('click', ()=>{
+      const inp = $('#board-note-input'); if(!inp.value.trim()) return;
+      boardNotes.unshift({ text: inp.value.trim(), ts: Date.now() });
+      if(boardNotes.length>50) boardNotes.pop();
+      inp.value=''; renderBoardNotes(); saveState();
+    });
+
+    $('#board-notes-list').addEventListener('click', (e) => {
+        const deleteBtn = e.target.closest('.delete-note-btn');
+        if (deleteBtn) {
+            const indexToDelete = parseInt(deleteBtn.dataset.index, 10);
+            if (!isNaN(indexToDelete)) {
+                boardNotes.splice(indexToDelete, 1);
+                saveState();
+                renderBoardNotes();
+            }
         }
+    });
 
-        function updateProgress() {
-            const progressBar = document.getElementById('progress-bar');
-            const progressText = document.getElementById('progress-text');
-            const completedCountEl = document.getElementById('completed-count');
-            const waitingForBeCountEl = document.getElementById('waiting-for-be-count');
-            const waitingForFeCountEl = document.getElementById('waiting-for-fe-count');
+    function buildNotesSummary(){
+      const wrap = $('#notes-summary'); wrap.innerHTML='';
+      tasks.forEach((sec, si)=>{
+        const notes = sec.items.filter(i=> (i.note||'').trim().length>0 );
+        if(!notes.length) return;
+        const box = document.createElement('div');
+        box.className='rounded border border-gray-200 bg-white dark:bg-slate-800 dark:border-slate-700';
+        const title = `${si+1}. ${sec.section}`;
+        const itemsHtml = notes.map(n=>`<li class="py-1"><span class="text-[11px] px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-700 mr-2">${n.label||n.id}</span>${n.note}</li>`).join('');
+        box.innerHTML = `<div class="px-3 py-2 text-sm font-semibold">${title}</div><ul class="px-3 pb-2 text-sm">${itemsHtml}</ul>`;
+        wrap.appendChild(box);
+      })
+    }
+    
+    // Koyu Tema
+    $('#dark-toggle').addEventListener('click', ()=>{
+        const isDark = document.documentElement.classList.toggle('dark');
+        $('#theme-icon-sun').classList.toggle('hidden', isDark);
+        $('#theme-icon-moon').classList.toggle('hidden', !isDark);
+    })
 
-            if (!progressBar || !completedCountEl) return;
+    // İlk kurulum
+    setupFirebase();
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.documentElement.classList.add('dark');
+        $('#theme-icon-sun').classList.add('hidden');
+        $('#theme-icon-moon').classList.remove('hidden');
+    }
 
-            const allItems = tasks.flatMap(s => s.items);
-            const totalTasks = allItems.length;
-            if (totalTasks === 0) return;
-
-            const completedTasks = allItems.filter(item => item.status === 1 || item.status === 2).length;
-            const waitingForBeTasks = allItems.filter(item => item.status === 3).length;
-            const waitingForFeTasks = allItems.filter(item => item.status === 4).length;
-            
-            const percentage = Math.round((completedTasks / totalTasks) * 100);
-
-            progressBar.style.width = `${percentage}%`;
-            progressText.textContent = `${percentage}% (${completedTasks}/${totalTasks})`;
-
-            completedCountEl.textContent = completedTasks;
-            waitingForBeCountEl.textContent = waitingForBeTasks;
-            waitingForFeCountEl.textContent = waitingForFeTasks;
-        }
-
-        function renderTasks() {
-            taskListContainer.innerHTML = '';
-            tasks.forEach(section => {
-                const sectionDiv = document.createElement('div');
-                sectionDiv.innerHTML = `<h2 class="text-xl font-semibold text-gray-700 border-b border-gray-200 pb-2 mb-4">${section.section}</h2>`;
-                const itemList = document.createElement('div');
-                itemList.className = 'space-y-1';
-
-                section.items.forEach((item, index) => {
-                    const itemContainer = document.createElement('div');
-                    
-                    let statusClass = '';
-                    switch (item.status) {
-                        case 1: statusClass = 'status-fe-done'; break;
-                        case 2: statusClass = 'status-be-done'; break;
-                        case 3: statusClass = 'status-fe-awaiting-be'; break;
-                        case 4: statusClass = 'status-be-awaiting-fe'; break;
-                    }
-
-                    const hasNote = item.note && item.note.trim() !== '';
-                    const noteIcon = hasNote 
-                        ? `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 5v8a2 2 0 01-2 2h-5l-5 4v-4H4a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2zM7 8H5v2h2V8zm2 0h2v2H9V8zm6 0h-2v2h2V8z" clip-rule="evenodd" /></svg>` 
-                        : `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" /></svg>`;
-
-                    const taskRowHTML = `
-                        <div class="task-item flex items-center p-2 rounded-lg hover:bg-gray-50 ${statusClass}">
-                            <span class="flex-grow task-text font-medium text-gray-800">
-                                <b class="text-gray-500 mr-2">${String.fromCharCode(97 + index)}.</b>${item.text}
-                            </span>
-                            <div class="radio-buttons">
-                                <div class="flex justify-center"><input type="radio" class="radio-fe-done" name="status-${item.id}" value="1" title="Frontend %100 Tamamlandı" ${item.status === 1 ? 'checked' : ''}></div>
-                                <div class="flex justify-center"><input type="radio" class="radio-be-done" name="status-${item.id}" value="2" title="Backend %100 Tamamlandı" ${item.status === 2 ? 'checked' : ''}></div>
-                                <div class="flex justify-center"><input type="radio" class="radio-fe-awaiting-be" name="status-${item.id}" value="3" title="Frontend Tamamlandı, Backend Bekleniyor" ${item.status === 3 ? 'checked' : ''}></div>
-                                <div class="flex justify-center"><input type="radio" class="radio-be-awaiting-fe" name="status-${item.id}" value="4" title="Backend Tamamlandı, Frontend Bekleniyor" ${item.status === 4 ? 'checked' : ''}></div>
-                            </div>
-                            <button class="note-toggle-btn ml-4 text-gray-400 hover:text-blue-600 p-1 rounded-full">
-                                ${noteIcon}
-                            </button>
-                        </div>
-                    `;
-
-                    const noteSectionHTML = `
-                        <div class="note-section bg-gray-50 rounded-b-lg px-4">
-                            <textarea class="w-full p-2 border rounded-md text-sm mt-2" placeholder="Notunuzu buraya ekleyin...">${item.note || ''}</textarea>
-                            <div class="text-right my-2">
-                                <button class="note-save-btn text-sm bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600">Kaydet</button>
-                            </div>
-                        </div>
-                    `;
-                    
-                    itemContainer.innerHTML = taskRowHTML + noteSectionHTML;
-
-                    const noteSection = itemContainer.querySelector('.note-section');
-
-                    itemContainer.querySelector('.note-toggle-btn').addEventListener('click', () => {
-                        noteSection.classList.toggle('show');
-                    });
-
-                    noteSection.querySelector('.note-save-btn').addEventListener('click', () => {
-                        const noteText = noteSection.querySelector('textarea').value;
-                        item.note = noteText;
-                        saveState(); 
-                        noteSection.classList.remove('show');
-                    });
-                    
-                    const currentStatus = item.status;
-                    itemContainer.querySelectorAll('input[type="radio"]').forEach(radio => {
-                        radio.addEventListener('click', (e) => {
-                            const clickedValue = parseInt(e.target.value);
-                            if (currentStatus === clickedValue) {
-                                handleStatusChange(item, 0);
-                            } else {
-                                handleStatusChange(item, clickedValue);
-                            }
-                        });
-                    });
-
-                    itemList.appendChild(itemContainer);
-                });
-                sectionDiv.appendChild(itemList);
-                taskListContainer.appendChild(sectionDiv);
-            });
-        }
-
-        // Uygulamayı başlat
-        setupFirebase();
-
-    </script>
+  </script>
 </body>
 </html>
+
