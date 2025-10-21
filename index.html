@@ -125,7 +125,7 @@
 
         <!-- Legend -->
         <div class="mb-6 p-3 border rounded-lg bg-gray-50 flex items-center justify-center flex-wrap gap-x-6 gap-y-2 text-xs text-gray-700">
-            <span class="font-bold text-gray-800">GÖSTERİM:</span>
+            <span class="font-bold text-gray-800">GÖSTERGE:</span>
             <div class="flex items-center space-x-2">
                 <div class="w-3 h-3 rounded-full bg-green-500"></div>
                 <span>FE Bitti</span>
@@ -156,121 +156,79 @@
 
         const tasks = [
             {
-                section: "1. Genel İyileştirmeler",
+                section: "Genel Maddeler",
                 items: [
-                    { id: 's1_a', text: 'Filtreler çoğaltılsın.', status: 0 },
-                    { id: 's1_b', text: 'Yakıtlar ayrı bir modül haline getirilsin, ismi “Yakıt Yönetimi” olsun.', status: 0 },
-                    { id: 's1_c', text: 'Yakıt Yönetimi modülü altında Total ve Petrol Ofisi verileri de listelensin.', status: 0 },
-                    { id: 's1_d', text: 'Modül sayfaları yapılandırılsın (Sipariş Girişi, Yakıt Girişi, Yakıt Çıkışı, Raporlar, Tanımlamalar).', status: 0 },
-                    { id: 's1_e', text: 'Depo seçimlerinde depo hakkında tüm detaylar yerine sadece isim görünsün.', status: 0 },
-                    { id: 's1_f', text: 'Tüm ekranlarda “Şoför” ifadesi “Sürücü” olarak güncellensin.', status: 0 },
-                    { id: 's1_g', text: 'Yeni kayıtlar listelere eklendiğinde en başta görüntülensin.', status: 0 },
-                    { id: 's1_h', text: 'Tanımlama ekranları tek bir ana kategori altında (Tanımlamalar) listelensin.', status: 0 },
-                    { id: 's1_i', text: 'Excel aktarımı yapılabilecek tüm ekranlara Excel çıktısı seçeneği eklensin.', status: 0 },
-                    { id: 's1_j', text: 'Tablo ikonları (düzenleme, belge yükleme vb.) her zaman görünsün; içeriği boşsa soluk şekilde gözüksün.', status: 0 },
+                    { id: 'gm_1', text: 'Total ve Petrol Ofisi ekranları “Yakıt Modülü” altına taşınacak.', status: 0 },
+                    { id: 'gm_2', text: 'Excel çıktıları alınamıyor.', status: 0 },
+                    { id: 'gm_3', text: 'Plaka seçimlerinde çekici ve treyler plakaları ayrıştırılsın.', status: 0 },
+                    { id: 'gm_4', text: 'Placeholder değeri “0” olan alanlar tıklandığında “0” değeri otomatik olarak kaybolmalı.', status: 0 },
+                    { id: 'gm_5', text: 'Miktar ve km girilen alanlarda 3 basamaktan sonra otomatik olarak nokta gösterimi aktif hale getirilsin.', status: 0 },
+                    { id: 'gm_6', text: 'Filtreler seçilmedikçe hiçbir filtre uygulanmasın.', status: 0 },
+                    { id: 'gm_7', text: 'İsim listelerinde alfabetik sıralama sağlansın.', status: 0 },
                 ]
             },
             {
-                section: "2. Depo Hareketleri",
+                section: "Depo Hareketleri",
                 items: [
-                    { id: 's2_a', text: 'Yakıt çıkışları bu ekrandan değil, Yakıt Çıkışları ekranı sol üst “+” butonundan girilsin.', status: 0 },
-                    { id: 's2_b', text: 'Kapatılan sipariş hareketleri silinebiliyor, bu engellenmeli.', status: 0 },
-                    { id: 's2_c', text: 'Sipariş No olmayan siparişlerin sipariş durumu tabloda görüntülenemiyor.', status: 0 },
-                    { id: 's2_d', text: 'Filtreler çoğaltılsın, arama kutusu aktif çalışsın.', status: 0 },
-                    { id: 's2_e', text: 'Depo dolumunda sipariş durumu “Bakiye Kapatıldı” olmasına rağmen, tabloda sipariş durumu alanına yansımıyor.', status: 0 },
-                    { id: 's2_f', text: 'İleri tarihli sipariş seçilerek dolum yapılmasına izin verilmesin.', status: 0 },
-                    { id: 's2_g', text: 'Toplamda sipariş miktarını aşan depo dolumu yapılmasına izin verilmesin.', status: 0 },
+                    { id: 'dh_1', text: 'İkonların düzeni karışık görünüyor.', status: 0 },
+                    { id: 'dh_2', text: 'AdBlue ve Motorin için ayrı bir sütun eklenmeli ve bu alanda filtreleme yapılabilmeli.', status: 0 },
                 ]
             },
             {
-                section: "3. Yakıt Siparişleri",
+                section: "Yakıt Girişi",
                 items: [
-                    { id: 's3_a', text: 'Breadcrumb yazıları düzeltilsin (operasyonel süreçler/parametreler).', status: 0 },
-                    { id: 's3_b', text: 'Breadcrumb ve sol menüdeki “Akaryakıt/Yakıt Siparişleri” isimleri tutarlı olsun.', status: 0 },
-                    { id: 's3_c', text: 'Arama kutusu eklensin, birden fazla sütunda arama yapılabilsin.', status: 0 },
-                    { id: 's3_d', text: 'Filtreler genişletilsin (tedarikçi, plaka, şube, tarih).', status: 0 },
-                    { id: 's3_e', text: 'Sipariş miktarı hem virgül hem nokta ile giriliyor, standartlaştırılsın.', status: 0 },
-                    { id: 's3_f', text: 'Sipariş miktarındaki ondalık değerlerin yuvarlanması sorunu düzeltilsin.', status: 0 },
-                    { id: 's3_g', text: 'Sipariş numarası otomatik üretilsin.', status: 0 },
-                    { id: 's3_h', text: 'Geçmişe sipariş girişi maksimum 1 hafta öncesine kadar yapılabilsin.', status: 0 },
-                    { id: 's3_i', text: 'Araç ve treyler plakalarında aynı plaka aynı anda seçilemesin.', status: 0 },
+                    { id: 'yg_1', text: 'Bazı siparişlerde depo isimleri eksik geliyor. (Örnek: 111111 nolu sipariş)', status: 0 },
+                    { id: 'yg_2', text: 'Zorunlu alanlar “*” işaretiyle gösterilsin.', status: 0 },
+                    { id: 'yg_3', text: 'Kapasite aşımında uyarıya rağmen kayıt tabloya işleniyor (gerçek dolum olmasa da).', status: 0 },
+                    { id: 'yg_4', text: 'Yakıt girişi yapılırken teslim alan kişiye sms doğrulaması gelmeli.', status: 0 },
                 ]
             },
             {
-                section: "4. Akaryakıt Depoları",
+                section: "Yakıt Tedarikçileri",
                 items: [
-                    { id: 's4_a', text: 'İşten çıkan personel, “Çalışanları Yönet” listelerinde görünmesin.', status: 0 },
-                    { id: 's4_b', text: 'Akaryakıt deposu miktarının noktalı (50.000) girişte hatalı kaydedilmesi düzeltilsin.', status: 0 },
-                    { id: 's4_c', text: 'Kapasite alanı boş bırakıldığında kayıt yapılmamalı.', status: 0 },
-                    { id: 's4_d', text: 'Zorunlu alanlar (*) ile işaretlensin.', status: 0 },
-                    { id: 's4_e', text: 'Arama fonksiyonu tüm ilgili alanlarda çalışsın.', status: 0 },
-                    { id: 's4_f', text: 'Arama kutusu temizlendiğinde liste otomatik yenilensin.', status: 0 },
-                    { id: 's4_g', text: 'Depo ismi güncelleme butonunun çalışmaması sorunu çözülsün.', status: 0 },
-                    { id: 's4_h', text: 'Depo Sorumlusu alanında karmaşık karakterler yerine isim görünsün.', status: 0 },
+                    { id: 'yt_1', text: 'Bread Crumbs yolu eski ekrana göre kalmış, güncellenmeli.', status: 0 },
                 ]
             },
             {
-                section: "5. Depo Sınıfı – Entegre Depo Sınıfı",
+                section: "Akaryakıt Depoları",
                 items: [
-                    { id: 's5_a', text: 'Boş kayıt oluşturulmasın.', status: 0 },
-                    { id: 's5_b', text: 'Güncelleme ekranında şube bilgisinin boş gelmesi sorunu düzeltilsin.', status: 0 },
+                    { id: 'ad_1', text: '“Çalışanları Yönet” kısmında isimler listelenmiyor.', status: 0 },
+                    { id: 'ad_2', text: 'Arama büyük/küçük harf duyarlı olmamalı ("ALİ" ve "ali" aynı sonucu vermeli).', status: 0 },
+                    { id: 'ad_3', text: 'Düzenleme ekranındaki “Güncelle” butonu çalışmıyor.', status: 0 },
                 ]
             },
             {
-                section: "6. Yakıt Girişi (Depo Dolumu)",
+                section: "Entegre Depo Sınıfı",
                 items: [
-                    { id: 's6_a', text: '“Aktarılan Yakıt” kutucuğundaki 0 değeri yazmaya başlanınca kaybolsun.', status: 0 },
+                    { id: 'eds_1', text: 'Hâlen boş kayıt oluşturulabiliyor.', status: 0 },
                 ]
             },
             {
-                section: "7. Yakıt Çıkışı Veri Giriş Ekranı",
+                section: "Depo Sınıfı",
                 items: [
-                    { id: 's7_a', text: 'AdBlue’da tek pompa aktif, diğer alan inaktif olsun.', status: 0 },
-                    { id: 's7_b', text: 'Depo seçim kutusunda tüm detaylar yerine sadece depo adı listelensin.', status: 0 },
-                    { id: 's7_c', text: 'Klima yakıtı eklenirken “Araç Klima Güncel Sayaç” alanı gelsin.', status: 0 },
-                    { id: 's7_d', text: 'Treyler plakası girilmemişse klima yakıtı seçeneği çıkmasın.', status: 0 },
+                    { id: 'ds_1', text: 'Depo sınıfında “Şube Bilgisi” alanı eklenmeli.', status: 0 },
                 ]
             },
             {
-                section: "8. Sipariş Veri İşleme Formu",
+                section: "Yakıt Çıkışı Veri Giriş Ekranı",
                 items: [
-                    { id: 's8_a', text: 'Hiçbir alan doldurulmadan kayıt yapılabiliyor, zorunlu alanlar işaretlenmeli.', status: 0 },
-                    { id: 's8_b', text: 'Belge türü ve fiyat listesi alanları kaldırılsın.', status: 0 },
-                    { id: 's8_c', text: 'Kantar ölçümünden “Konum” alanı kaldırılsın.', status: 0 },
-                    { id: 's8_d', text: 'Kg/hacim gösterimleri nokta/virgül formatına uygun hale getirilsin.', status: 0 },
-                    { id: 's8_e', text: '“Kantar-1 ölçümü” zorunlu olsun.', status: 0 },
-                    { id: 's8_f', text: 'Kantarda boş kısmına doludan fazla giriş yapılmasın.', status: 0 },
-                    { id: 's8_g', text: 'Giriş tarihi çıkış tarihinden sonra olamasın.', status: 0 },
-                    { id: 's8_h', text: 'Teslim tarihi sevk zamanından önce girilemesin.', status: 0 },
-                    { id: 's8_i', text: '“Şahit Seri No” alanı, “e-irsaliye” alanının altına taşınsın.', status: 0 },
-                    { id: 's8_j', text: 'Laboratuvar ölçüm verileri otomatik dolu gelmesin, boş gelsin.', status: 0 },
-                    { id: 's8_k', text: 'Göz göz yakıt girişi yapılacak alan veri işleme formuna eklensin.', status: 0 },
+                    { id: 'ycve_1', text: '“Araç Klima Güncel Sayaç” alanı yukarı taşınsın. Treyler plakası seçilirse aktif gelsin.', status: 0 },
+                    { id: 'ycve_2', text: 'Çekici ve treyler plakaları aynı anda seçilemesin; plakalar türüne göre listelensin.', status: 0 },
                 ]
             },
             {
-                section: "9. Depo Sınıfı Sayfaları",
+                section: "Sipariş Veri İşleme Formu",
                 items: [
-                    { id: 's9_a', text: 'Tablo görünümünde görsel düzenleme yapılmalı.', status: 0 },
+                    { id: 'svif_1', text: '“Göz göz yakıt giriş alanı” veri işleme formunda hâlen uygulanmamış.', status: 0 },
+                    { id: 'svif_2', text: 'Bread Crumbs yolu eski ekrana göre kalmış, güncellenmeli.', status: 0 },
+                    { id: 'svif_3', text: 'Kantar tarihleri ilgili sipariş tarihinden öncesi seçilemesin.', status: 0 },
+                    { id: 'svif_4', text: 'Kantar ölçümündeki mavi toplam kartlarının sayı görünümü düzeltilmeli.', status: 0 },
                 ]
             },
             {
-                section: "10. Yakıt Çıkış Raporları",
+                section: "Yakıt Çıkış Raporları",
                 items: [
-                    { id: 's10_a', text: 'Tabloya görev yeri sütunu eklensin.', status: 0 },
-                    { id: 's10_b', text: 'Klima yakıtları ve AdBlue yakıtları da raporlansın.', status: 0 },
-                    { id: 's10_c', text: 'Veri girişi buradan yapılmasın, sayfanın ismi “Yakıt Çıkışları” olsun.', status: 0 },
-                    { id: 's10_d', text: 'Şubeye göre filtreleme ve toplam görünsün.', status: 0 },
-                    { id: 's10_e', text: '“Temizle” butonuna basınca tüm verilerin kaybolması sorunu düzeltilsin.', status: 0 },
-                    { id: 's10_f', text: 'Raporlara sayfalama eklensin.', status: 0 },
-                ]
-            },
-            {
-                section: "11. Depo Doluluk Seviyeleri",
-                items: [
-                    { id: 's11_a', text: 'Filtrelerin isimleri placeholder yerine başlık olarak kutucukların üstünde görünsün.', status: 0 },
-                    { id: 's11_b', text: 'Min, max, kritik, ort değerleri grafikte gerçek seviyelere uygun işaretlensin.', status: 0 },
-                    { id: 's11_c', text: 'Kritik seviye çizgilerinin görünmemesi sorunu düzeltilsin ve renklendirilsin.', status: 0 },
-                    { id: 's11_d', text: 'Grafik ve tablo verilerinin birbiriyle tutarlı olması sağlansın.', status: 0 },
+                    { id: 'ycr_1', text: '“Görev Yeri” sütunu halen bulunmuyor.', status: 0 },
                 ]
             }
         ];
@@ -300,7 +258,7 @@
                 db = getFirestore(app);
                 const auth = getAuth(app);
                 
-                const docPath = `checklists/sertel_tms_yakit_revizyon_v1`;
+                const docPath = `checklists/sertel_tms_yakit_revizyon_v2`; // Döküman yolunu yeni liste için güncelledim.
                 checklistDocRef = doc(db, docPath);
 
                 await signInAnonymously(auth);
@@ -499,5 +457,3 @@
     </script>
 </body>
 </html>
-
-
