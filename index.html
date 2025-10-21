@@ -78,12 +78,10 @@
     <details id="bulk-notes" class="mb-4 sm:mb-6 rounded-lg border border-gray-200 bg-gray-50">
       <summary class="cursor-pointer select-none px-3 py-2 sm:px-4 sm:py-3 text-sm sm:text-base font-semibold text-gray-700">Genel Notlar</summary>
       <div class="p-3 sm:p-4 space-y-3">
-        <div class="flex items-center justify-between"><span class="text-xs sm:text-sm text-gray-500">Görev notlarının özet görünümü</span></div>
-        <div id="notes-summary" class="space-y-2 text-sm"></div>
-        <div class="border-t border-gray-200 pt-3">
-          <label class="block text-xs text-gray-500 mb-1">Paylaşımlı Not Ekle:</label>
+        <div id="notes-summary" class="space-y-2 text-sm border-b border-gray-200 pb-1 mb-1"></div>
+        <div>
           <div class="flex gap-2">
-            <input id="board-note-input" class="flex-1 rounded border border-gray-300 px-2 py-1 text-sm" placeholder="Kısa not..." />
+            <input id="board-note-input" class="flex-1 rounded border border-gray-300 px-2 py-1 text-sm" placeholder="Not ekle..." />
             <button id="board-note-add" class="text-xs px-3 py-1 rounded bg-blue-600 text-white hover:bg-blue-700">Ekle</button>
           </div>
           <ul id="board-notes-list" class="mt-2 space-y-1 text-xs"></ul>
@@ -239,15 +237,17 @@
       const completed = all.filter(i=>i.status===1||i.status===2).length;
       $('#session-line').textContent = `Toplam ${all.length} görevden ${completed} tanesi tamamlandı.`;
       
-      const idle = all.filter(i => i.status === 0).length;
+      const workingOn = all.filter(i => i.working).length;
+      const idle = all.filter(i => i.status === 0 && !i.working).length;
       const waitBe = all.filter(i => i.status === 3).length;
       const waitFe = all.filter(i => i.status === 4).length;
       const summaryEl = $('#detailed-summary');
       if (summaryEl) {
           summaryEl.innerHTML = `
               <span><b class="font-semibold text-gray-600 dark:text-slate-300">${idle}</b> boşta</span>
-              <span class="text-orange-600"><b class="font-semibold">${waitBe}</b> BE Bekliyor</span>
-              <span class="text-yellow-600"><b class="font-semibold">${waitFe}</b> FE Bekliyor</span>
+              <span class="text-violet-600 dark:text-violet-400"><b class="font-semibold">${workingOn}</b> Üzerinde Çalışılıyor</span>
+              <span class="text-orange-600 dark:text-orange-400"><b class="font-semibold">${waitBe}</b> BE Bekliyor</span>
+              <span class="text-yellow-600 dark:text-yellow-400"><b class="font-semibold">${waitFe}</b> FE Bekliyor</span>
           `;
       }
     }
