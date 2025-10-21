@@ -11,10 +11,12 @@
     body { font-family: 'Inter', sans-serif; background-color: #f8fafc; transition: background-color 0.3s; }
     .task-item .task-text { transition: color 0.3s ease-in-out; }
     /* Durum Stilleri */
-    .status-fe-done .task-text { text-decoration: line-through; text-decoration-color: #22c55e; text-decoration-thickness: 2px; color: #4ade80; }
-    .status-be-done .task-text { text-decoration: line-through; text-decoration-color: #3b82f6; text-decoration-thickness: 2px; color: #60a5fa; }
-    .status-fe-awaiting-be .task-text { color: #f97316; font-weight: 500; }
-    .status-be-awaiting-fe .task-text { color: #ca8a04; font-weight: 500; }
+    .status-1 .task-text { text-decoration: line-through; text-decoration-color: #22c55e; text-decoration-thickness: 2px; color: #4ade80; } /* Tamamlandı */
+    .status-3 .task-text { color: #f97316; font-weight: 500; } /* BE Bekleniyor */
+    .status-4 .task-text { color: #ca8a04; font-weight: 500; } /* FE Bekleniyor */
+    .status-5 .task-text { text-decoration: line-through; text-decoration-color: #ef4444; color: #f87171; } /* İptal */
+    .status-6 .task-text { color: #8b5cf6; font-weight: 500; } /* Yanıt Bekleniyor */
+
     /* Dark Mode Kontrast İyileştirmeleri */
     .dark body { background-color:#0f172a; }
     .dark .card { background-color:#1e293b; color:#cbd5e1; border-color: #334155; }
@@ -27,29 +29,28 @@
     .dark .bg-gray-50 { background-color: #334155; }
     .dark .bg-slate-50 { background-color: #334155; }
 
-    #connection-status { transition: opacity 0.5s; }
-    .radio-buttons { display: grid; grid-template-columns: repeat(4, minmax(2.5rem,1fr)); gap: .5rem; min-width: 240px; margin-left: auto; padding-left: .5rem; }
+    .radio-buttons { display: grid; grid-template-columns: repeat(5, minmax(2.5rem,1fr)); gap: .5rem; min-width: 300px; margin-left: auto; padding-left: .5rem; }
     .radio-buttons input { cursor: pointer; width: 1.25rem; height: 1.25rem; }
-    .radio-fe-done { accent-color: #22c55e; }
-    .radio-be-done { accent-color: #3b82f6; }
-    .radio-fe-awaiting-be { accent-color: #f97316; }
-    .radio-be-awaiting-fe { accent-color: #ca8a04; }
+    .radio-1 { accent-color: #22c55e; }
+    .radio-3 { accent-color: #f97316; }
+    .radio-4 { accent-color: #ca8a04; }
+    .radio-5 { accent-color: #ef4444; }
+    .radio-6 { accent-color: #8b5cf6; }
 
-    .note-section { max-height: 0; overflow: hidden; transition: max-height .3s ease-out, padding .3s ease-out, background-color .2s; }
-    .note-section.show { max-height: 220px; padding-top: .5rem; padding-bottom: .75rem; }
+    .details-section, .note-section { max-height: 0; overflow: hidden; transition: max-height .3s ease-out, padding .3s ease-out, background-color .2s; }
+    .details-section.show, .note-section.show { max-height: 220px; padding-top: .5rem; padding-bottom: .75rem; }
+    
     .note-sticky-bar { position: sticky; bottom: 0; display:flex; justify-content: flex-end; align-items: center; gap:.5rem; background: linear-gradient(180deg, rgba(249,250,251,0), rgba(249,250,251,1) 40%); padding-top:.5rem; }
     .dark .note-sticky-bar { background: linear-gradient(180deg, rgba(51,65,85,0), rgba(51,65,85,1) 40%); }
 
-    /* "Üzerinde Çalışılıyor" Vurgusu */
     .working-ring { box-shadow: 0 0 0 3px rgba(139,92,246,.25), 0 0 0 6px rgba(139,92,246,.12); animation: pulseGlow 1.2s ease-in-out infinite; border-radius: .75rem; }
     @keyframes pulseGlow { 0%{ box-shadow: 0 0 0 0 rgba(139,92,246,.35), 0 0 0 3px rgba(139,92,246,.12);} 50%{ box-shadow: 0 0 0 6px rgba(139,92,246,.25), 0 0 0 12px rgba(139,92,246,.08);} 100%{ box-shadow: 0 0 0 0 rgba(139,92,246,.0), 0 0 0 3px rgba(139,92,246,.0);} }
     
     #confetti-canvas { position: fixed; top: 0; right: 0; width: 100%; height: 100%; pointer-events: none; z-index: 40; }
 
-    /* Mobil uyum – satırları parçala */
-    @media (max-width: 640px){
+    @media (max-width: 768px){
       .task-row { flex-direction: column; align-items: stretch; gap: .5rem; }
-      .radio-buttons { order: 3; grid-template-columns: repeat(4, 1fr); min-width: auto; padding-left: 0; }
+      .radio-buttons { order: 3; grid-template-columns: repeat(5, 1fr); min-width: auto; padding-left: 0; }
       .task-aux { order: 2; display:flex; align-items:center; gap:.5rem; }
     }
   </style>
@@ -74,14 +75,13 @@
       </div>
     </div>
 
-    <!-- Genel Notlar (Collapse) -->
     <details id="bulk-notes" class="mb-4 sm:mb-6 rounded-lg border border-gray-200 bg-gray-50">
       <summary class="cursor-pointer select-none px-3 py-2 sm:px-4 sm:py-3 text-sm sm:text-base font-semibold text-gray-700">Genel Notlar</summary>
       <div class="p-3 sm:p-4 space-y-3">
         <div id="notes-summary" class="space-y-2 text-sm border-b border-gray-200 pb-1 mb-1"></div>
         <div>
           <div class="flex gap-2">
-            <input id="board-note-input" class="flex-1 rounded border border-gray-300 px-2 py-1 text-sm" placeholder="Not ekle..." />
+            <input id="board-note-input" class="flex-1 rounded border border-gray-300 px-2 py-1 text-sm" placeholder="Paylaşımlı not ekle..." />
             <button id="board-note-add" class="text-xs px-3 py-1 rounded bg-blue-600 text-white hover:bg-blue-700">Ekle</button>
           </div>
           <ul id="board-notes-list" class="mt-2 space-y-1 text-xs"></ul>
@@ -89,7 +89,6 @@
       </div>
     </details>
 
-    <!-- Özet Satırı -->
     <div class="mb-6 px-2">
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2">
         <span id="session-line" class="text-sm font-medium text-gray-600">Başlıyoruz…</span>
@@ -98,25 +97,22 @@
       <div class="w-full bg-gray-200 rounded-full h-3">
         <div id="progress-bar" class="bg-green-500 h-3 rounded-full" style="width: 0%; transition: width .5s ease-in-out;"></div>
       </div>
-      <div id="detailed-summary" class="mt-2 text-center text-xs text-gray-500 dark:text-slate-400 flex flex-wrap justify-center gap-x-4 gap-y-1">
-      </div>
+      <div id="detailed-summary" class="mt-2 text-center text-xs text-gray-500 dark:text-slate-400 flex flex-wrap justify-center gap-x-4 gap-y-1"></div>
     </div>
     
-    <!-- Filtreler -->
     <div class="mb-5 flex flex-wrap justify-center items-center gap-2 p-2 rounded-lg bg-gray-100 dark:bg-slate-800 text-xs">
         <span class="font-semibold text-gray-700 dark:text-slate-300 mr-2">Filtrele:</span>
         <button data-filter="all" class="filter-btn px-2 py-1 rounded bg-slate-800 text-white">Tümü</button>
-        <button data-filter="1" class="filter-btn px-2 py-1 rounded bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300">FE Bitti</button>
-        <button data-filter="2" class="filter-btn px-2 py-1 rounded bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300">BE Bitti</button>
-        <button data-filter="3" class="filter-btn px-2 py-1 rounded bg-orange-100 text-orange-800 dark:bg-orange-900/50 dark:text-orange-300">BE Bekleniyor</button>
+        <button data-filter="1" class="filter-btn px-2 py-1 rounded bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300">Tamamlandı</button>
+        <button data-filter="3" class="filter-btn px-2 py-1 rounded bg-orange-100 text-orange-800 dark:bg-orange-900/50 dark:text-orange-300">BE Bekliyor</button>
         <button data-filter="4" class="filter-btn px-2 py-1 rounded bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300">FE Bekleniyor</button>
+        <button data-filter="5" class="filter-btn px-2 py-1 rounded bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300">İptal</button>
+        <button data-filter="6" class="filter-btn px-2 py-1 rounded bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-300">Yanıt Bekliyor</button>
         <button data-filter="working" class="filter-btn px-2 py-1 rounded bg-violet-100 text-violet-800 dark:bg-violet-900/50 dark:text-violet-300">Çalışılanlar</button>
     </div>
 
-
     <div id="task-list" class="space-y-6"></div>
 
-    <!-- Son Değişiklikler Şeridi -->
     <div class="mt-6 pt-3 border-t border-gray-200">
       <div id="recent-strip" class="flex flex-wrap gap-2"></div>
     </div>
@@ -127,7 +123,6 @@
     import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
     import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    // ---------- Yardımcılar ----------
     const $ = (s, d=document) => d.querySelector(s);
     const $$ = (s, d=document) => Array.from(d.querySelectorAll(s));
     const isToday = (dt)=>{ const t=new Date(); return dt.getDate()===t.getDate() && dt.getMonth()===t.getMonth() && dt.getFullYear()===t.getFullYear(); };
@@ -140,73 +135,62 @@
       const mins = Math.floor(diff/60000);
       if(mins < 1) return 'az önce';
       if(mins < 60) return `${mins} dk önce`;
-      const hrs = Math.floor(mins/60);
       if(isToday(new Date(ts))) return `Bugün ${formatTimeTR(new Date(ts))}`;
       return new Date(ts).toLocaleString('tr-TR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
     };
 
-    // ---------- Veri ----------
     const tasks = [
         { section: "Genel Maddeler", items: [
-            { id:'gm_1', text:'Total ve Petrol Ofisi ekranları “Yakıt Modülü” altına taşınacak.', status:0 },
-            { id:'gm_2', text:'Excel çıktıları alınamıyor.', status:0 },
-            { id:'gm_3', text:'Plaka seçimlerinde çekici ve treyler plakaları ayrıştırılsın.', status:0 },
-            { id:'gm_4', text:'Placeholder değeri “0” olan alanlar tıklandığında “0” değeri otomatik olarak kaybolmalı.', status:0 },
-            { id:'gm_5', text:'Miktar ve km girilen alanlarda 3 basamaktan sonra otomatik olarak nokta gösterimi aktif hale getirilsin.', status:0 },
-            { id:'gm_6', text:'Filtreler seçilmedikçe hiçbir filtre uygulanmasın.', status:0 },
-            { id:'gm_7', text:'İsim listelerinde alfabetik sıralama sağlansın.', status:0 },
+            { id:'gm_1', text:'Total ve Petrol Ofisi ekranları “Yakıt Modülü” altına taşınacak.' },
+            { id:'gm_2', text:'Excel çıktıları alınamıyor.' },
+            { id:'gm_3', text:'Plaka seçimlerinde çekici ve treyler plakaları ayrıştırılsın.', details: 'TMS envanterinde “Araç Ana Tipi” filtresiyle “Treyler”, “Römork” gibi tiplerde filtreleme yapılarak plaka çekilebilir. (TMS envanterinin güncel olduğu teyit edilmiştir.)' },
+            { id:'gm_4', text:'Placeholder değeri “0” olan alanlar tıklandığında “0” değeri otomatik olarak kaybolmalı.', details: 'Bu özellik bazı alanlarda mevcut, ancak tüm ilgili alanlara uygulanması gerekiyor.' },
+            { id:'gm_5', text:'Miktar ve km girilen alanlarda 3 basamaktan sonra otomatik olarak nokta gösterimi aktif hale getirilsin.' },
+            { id:'gm_6', text:'Filtreler seçilmedikçe hiçbir filtre uygulanmasın.' },
+            { id:'gm_7', text:'İsim listelerinde alfabetik sıralama sağlansın.', details: 'Örnek: “YA” yazıldığında “Yalçın” ismi “Şener Sayar”dan önce gelmeli.' },
         ]},
         { section: "Depo Hareketleri", items: [
-            { id:'dh_1', text:'İkonların düzeni karışık görünüyor.', status:0 },
-            { id:'dh_2', text:'AdBlue ve Motorin için ayrı bir sütun eklenmeli ve bu alanda filtreleme yapılabilmeli.', status:0 },
+            { id:'dh_1', text:'İkonların düzeni karışık görünüyor.' },
+            { id:'dh_2', text:'AdBlue ve Motorin için ayrı bir sütun eklenmeli ve bu alanda filtreleme yapılabilmeli.' },
         ]},
         { section: "Yakıt Girişi", items: [
-            { id:'yg_1', text:'Bazı siparişlerde depo isimleri eksik geliyor. (Örnek: 111111 nolu sipariş)', status:0 },
-            { id:'yg_2', text:'Zorunlu alanlar “*” işaretiyle gösterilsin.', status:0 },
-            { id:'yg_3', text:'Kapasite aşımında uyarıya rağmen kayıt tabloya işleniyor (gerçek dolum olmasa da).', status:0 },
-            { id:'yg_4', text:'Yakıt girişi yapılırken teslim alan kişiye sms doğrulaması gelmeli.', status:0 },
+            { id:'yg_1', text:'Bazı siparişlerde depo isimleri eksik geliyor.', details: 'Örnek: 111111 nolu sipariş.' },
+            { id:'yg_2', text:'Zorunlu alanlar “*” işaretiyle gösterilsin.' },
+            { id:'yg_3', text:'Kapasite aşımında uyarıya rağmen kayıt tabloya işleniyor.', details: 'Kapasite sınırını aşan miktar girildiğinde sistem “Depo kapasitesini aşamaz” uyarısı veriyor; ancak buna rağmen kayıt Depo Hareketleri tablosuna işleniyor. Kayıt hareketlerde görünmesine rağmen gerçekte dolum işlemi gerçekleşmiyor (depo seviyesi artmıyor). Bu durum aynı depo birden fazla kez seçildiğinde meydana geliyor.' },
+            { id:'yg_4', text:'Yakıt girişi yapılırken teslim alan kişiye sms doğrulaması gelmeli.' },
         ]},
         { section: "Yakıt Tedarikçileri", items: [
-            { id:'yt_1', text:'Bread Crumbs yolu eski ekrana göre kalmış, güncellenmeli.', status:0 },
+            { id:'yt_1', text:'Breadcrumbs yolu eski ekrana göre kalmış, güncellenmeli.' },
         ]},
         { section: "Akaryakıt Depoları", items: [
-            { id:'ad_1', text:'“Çalışanları Yönet” kısmında isimler listelenmiyor.', status:0 },
-            { id:'ad_2', text:'Arama büyük/küçük harf duyarlı olmamalı ("ALİ" ve "ali" aynı sonucu vermeli).', status:0 },
-            { id:'ad_3', text:'Düzenleme ekranındaki “Güncelle” butonu çalışmıyor.', status:0 },
+            { id:'ad_1', text:'“Çalışanları Yönet” kısmında isimler listelenmiyor.' },
+            { id:'ad_2', text:'Arama büyük/küçük harf duyarlı olmamalı.', details: 'Örnek: "ALİ" ve "ali" aynı sonucu vermeli.' },
+            { id:'ad_3', text:'Düzenleme ekranındaki “Güncelle” butonu çalışmıyor.' },
         ]},
-        { section: "Entegre Depo Sınıfı", items: [
-            { id:'eds_1', text:'Hâlen boş kayıt oluşturulabiliyor.', status:0 },
-        ]},
-        { section: "Depo Sınıfı", items: [
-            { id:'ds_1', text:'Depo sınıfında “Şube Bilgisi” alanı eklenmeli.', status:0 },
-        ]},
+        { section: "Entegre Depo Sınıfı", items: [ { id:'eds_1', text:'Hâlen boş kayıt oluşturulabiliyor.' } ]},
+        { section: "Depo Sınıfı", items: [ { id:'ds_1', text:'Depo sınıfında “Şube Bilgisi” alanı eklenmeli.' } ]},
         { section: "Yakıt Çıkışı Veri Giriş Ekranı", items: [
-            { id:'ycve_1', text:'“Araç Klima Güncel Sayaç” alanı yukarı taşınsın. Treyler plakası seçilirse aktif gelsin.', status:0 },
-            { id:'ycve_2', text:'Çekici ve treyler plakaları aynı anda seçilemesin; plakalar türüne göre listelensin.', status:0 },
+            { id:'ycve_1', text:'“Araç Klima Güncel Sayaç” alanı yukarı taşınsın, treyler seçilirse aktif olsun.' },
+            { id:'ycve_2', text:'Çekici ve treyler plakaları aynı anda seçilemesin; plakalar türüne göre listelensin.' },
         ]},
         { section: "Sipariş Veri İşleme Formu", items: [
-            { id:'svif_1', text:'“Göz göz yakıt giriş alanı” veri işleme formunda hâlen uygulanmamış.', status:0 },
-            { id:'svif_2', text:'Bread Crumbs yolu eski ekrana göre kalmış, güncellenmeli.', status:0 },
-            { id:'svif_3', text:'Kantar tarihleri ilgili sipariş tarihinden öncesi seçilemesin.', status:0 },
-            { id:'svif_4', text:'Kantar ölçümündeki mavi toplam kartlarının sayı görünümü düzeltilmeli.', status:0 },
+            { id:'svif_1', text:'“Göz göz yakıt giriş alanı” veri işleme formunda hâlen uygulanmamış.' },
+            { id:'svif_2', text:'Breadcrumbs yolu eski ekrana göre kalmış, güncellenmeli.' },
+            { id:'svif_3', text:'Kantar tarihleri ilgili sipariş tarihinden öncesi seçilemesin.' },
+            { id:'svif_4', text:'Kantar ölçümündeki mavi toplam kartlarının sayı görünümü düzeltilmeli.' },
         ]},
-        { section: "Yakıt Çıkış Raporları", items: [
-            { id:'ycr_1', text:'“Görev Yeri” sütunu halen bulunmuyor.', status:0 },
-        ]},
+        { section: "Yakıt Çıkış Raporları", items: [ { id:'ycr_1', text:'“Görev Yeri” sütunu halen bulunmuyor.' } ]},
     ];
 
-    // Firebase
     let db; let checklistDocRef; let isDataLoadedFromFirebase = false;
     const firebaseConfig = { apiKey:"AIzaSyBkE1ZA4R8H8dtXzQK3_1f-ziASaqRWbNM", authDomain:"checklist-44855.firebaseapp.com", projectId:"checklist-44855", storageBucket:"checklist-44855.firebasestorage.app", messagingSenderId:"287422053970", appId:"1:287422053970:web:0f47ebb4fa2e98aba0298b" };
 
-    // UI refs
     const taskListContainer = $('#task-list');
     const connectionStatus = $('#connection-status');
     const connectionText = $('#connection-text');
 
-    // Durum
     let activeFilter = 'all';
-    const recentTouched = []; // {id, label, ts}
+    const recentTouched = []; 
     let boardNotes = [];
 
     function bumpRecent(item, label){
@@ -234,20 +218,25 @@
 
     function updateSessionLine(){
       const all = tasks.flatMap(s=>s.items);
-      const completed = all.filter(i=>i.status===1||i.status===2).length;
+      const completed = all.filter(i=>i.status===1).length;
       $('#session-line').textContent = `Toplam ${all.length} görevden ${completed} tanesi tamamlandı.`;
       
       const workingOn = all.filter(i => i.working).length;
       const idle = all.filter(i => i.status === 0 && !i.working).length;
       const waitBe = all.filter(i => i.status === 3).length;
       const waitFe = all.filter(i => i.status === 4).length;
+      const canceled = all.filter(i => i.status === 5).length;
+      const waitingReply = all.filter(i => i.status === 6).length;
+
       const summaryEl = $('#detailed-summary');
       if (summaryEl) {
           summaryEl.innerHTML = `
-              <span><b class="font-semibold text-gray-600 dark:text-slate-300">${idle}</b> Boşta</span>
-              <span class="text-violet-600 dark:text-violet-400"><b class="font-semibold">${workingOn}</b> Üzerinde Çalışılıyor</span>
-              <span class="text-orange-600 dark:text-orange-400"><b class="font-semibold">${waitBe}</b> BE Bekliyor</span>
-              <span class="text-yellow-600 dark:text-yellow-400"><b class="font-semibold">${waitFe}</b> FE Bekliyor</span>
+              <span><b class="font-semibold text-gray-600 dark:text-slate-300">${idle}</b> boşta</span>
+              <span class="text-violet-600 dark:text-violet-400"><b class="font-semibold">${workingOn}</b> çalışılıyor</span>
+              <span class="text-orange-600 dark:text-orange-400"><b class="font-semibold">${waitBe}</b> BE Bkl.</span>
+              <span class="text-yellow-600 dark:text-yellow-400"><b class="font-semibold">${waitFe}</b> FE Bkl.</span>
+              <span class="text-purple-600 dark:text-purple-400"><b class="font-semibold">${waitingReply}</b> yanıt bkl.</span>
+              <span class="text-red-600 dark:text-red-400"><b class="font-semibold">${canceled}</b> iptal</span>
           `;
       }
     }
@@ -257,7 +246,7 @@
         const app = initializeApp(firebaseConfig);
         db = getFirestore(app);
         const auth = getAuth(app);
-        checklistDocRef = doc(db, 'checklists/sertel_tms_yakit_revizyon_v2');
+        checklistDocRef = doc(db, 'checklists/sertel_tms_yakit_revizyon_v3');
         await signInAnonymously(auth);
         listenForUpdates();
       }catch(err){
@@ -287,6 +276,7 @@
         tasks.forEach(section=>{
           section.items.forEach(item=>{
             const saved = savedTasks.find(t=>t.id===item.id);
+            item.status = 0; item.note = ''; item.working = false; item.lastUpdated = 0; item.noteUpdated = 0;
             if(saved){
               item.status = typeof saved.status==='number'? saved.status : 0;
               item.note = saved.note || '';
@@ -303,12 +293,6 @@
         updateSessionLine();
       }, (error)=>{
         console.error('Firestore listener error:', error);
-        const statusDiv = connectionStatus.querySelector('div');
-        statusDiv.classList.add('bg-red-500');
-        statusDiv.classList.remove('bg-green-500','animate-pulse');
-        connectionText.textContent = 'Bağlantı Koptu';
-        connectionText.classList.add('text-red-600');
-        connectionStatus.style.opacity = 1;
       })
     }
 
@@ -326,12 +310,12 @@
       item.lastUpdated = Date.now();
       bumpRecent(item, item.label || item.id);
       renderTasks(); updateProgress(); updateSessionLine(); saveState();
-      if((newStatus===1 || newStatus===2) && !(old===1||old===2)) confetti(600);
+      if(newStatus===1 && old!==1) confetti(600);
     }
 
     function updateProgress(){
       const all = tasks.flatMap(s=>s.items); const total = all.length; if(!total) return;
-      const completed = all.filter(i=>i.status===1 || i.status===2).length;
+      const completed = all.filter(i=>i.status===1).length;
       const pct = Math.round((completed/total)*100);
       $('#progress-bar').style.width = pct+'%';
       $('#progress-text').textContent = `${pct}%`;
@@ -379,7 +363,7 @@
 
           const container = document.createElement('div');
           container.setAttribute('data-task-id', item.id);
-          const statusClass = item.status===1? 'status-fe-done' : item.status===2? 'status-be-done' : item.status===3? 'status-fe-awaiting-be' : item.status===4? 'status-be-awaiting-fe' : '';
+          const statusClass = `status-${item.status}`;
           const workingClass = item.working? 'working-ring' : '';
 
           const infoBadge = item.lastUpdated ? `<span class="badge-updated text-[10px] px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-600 text-slate-600 dark:text-slate-300">${humanizeSince(item.lastUpdated)}</span>` : '';
@@ -389,22 +373,28 @@
           const noteIconSVG = hasNote 
               ? `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.94 8.94 0 01-4.062-.982 1 1 0 00-.874.195l-2.036.944a1 1 0 01-1.294-1.294l.944-2.036a1 1 0 00.195-.874A8.94 8.94 0 012 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9a1 1 0 11-2 0 1 1 0 012 0zm4 0a1 1 0 11-2 0 1 1 0 012 0zm4 0a1 1 0 11-2 0 1 1 0 012 0z" clip-rule="evenodd" /></svg>` 
               : `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" /></svg>`;
+          
+          const hasDetails = item.details && item.details.trim() !== '';
+          const detailsIconHTML = hasDetails ? `<button class="details-toggle-btn text-gray-400 hover:text-blue-600 p-1 rounded-full -ml-1" title="Detayları Gör"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" /></svg></button>` : '';
 
           container.className = `task-item ${statusClass} ${workingClass} p-2 rounded-lg hover:bg-gray-50`;
           container.innerHTML = `
             <div class="task-row flex items-center gap-2">
-              <span class="task-text font-medium text-gray-800 flex-1">
-                <b class="text-gray-500 mr-2">${displayLabel}.</b>${item.text}
+              <span class="task-text font-medium text-gray-800 flex-1 flex items-center">
+                <b class="text-gray-500 mr-2">${displayLabel}.</b>
+                <span>${item.text}</span>
+                ${detailsIconHTML}
               </span>
               <div class="task-aux flex items-center gap-2">
                 ${infoBadge}
                 ${workingBadge}
               </div>
               <div class="radio-buttons">
-                <div class="flex justify-center"><input type="radio" class="radio-fe-done" name="status-${item.id}" value="1" title="Frontend %100 Tamamlandı" ${item.status===1?'checked':''}></div>
-                <div class="flex justify-center"><input type="radio" class="radio-be-done" name="status-${item.id}" value="2" title="Backend %100 Tamamlandı" ${item.status===2?'checked':''}></div>
-                <div class="flex justify-center"><input type="radio" class="radio-fe-awaiting-be" name="status-${item.id}" value="3" title="Frontend Tamamlandı, Backend Bekleniyor" ${item.status===3?'checked':''}></div>
-                <div class="flex justify-center"><input type="radio" class="radio-be-awaiting-fe" name="status-${item.id}" value="4" title="Backend Tamamlandı, Frontend Bekleniyor" ${item.status===4?'checked':''}></div>
+                <div class="flex justify-center"><input type="radio" class="radio-1" name="status-${item.id}" value="1" title="Tamamlandı" ${item.status===1?'checked':''}></div>
+                <div class="flex justify-center"><input type="radio" class="radio-3" name="status-${item.id}" value="3" title="BE Bekleniyor" ${item.status===3?'checked':''}></div>
+                <div class="flex justify-center"><input type="radio" class="radio-4" name="status-${item.id}" value="4" title="FE Bekleniyor" ${item.status===4?'checked':''}></div>
+                <div class="flex justify-center"><input type="radio" class="radio-5" name="status-${item.id}" value="5" title="İptal" ${item.status===5?'checked':''}></div>
+                <div class="flex justify-center"><input type="radio" class="radio-6" name="status-${item.id}" value="6" title="Yanıt Bekleniyor" ${item.status===6?'checked':''}></div>
               </div>
               <button class="note-toggle-btn ml-2 text-gray-400 hover:text-blue-600 p-1 rounded-full" title="Not Ekle/Aç">
                 ${noteIconSVG}
@@ -414,6 +404,12 @@
               <label class="inline-flex items-center gap-1 cursor-pointer select-none"><input type="checkbox" class="working-toggle accent-violet-600" ${item.working?'checked':''}/> Üzerinde çalışılıyor</label>
             </div>
           `;
+
+          const detailsSection = document.createElement('div');
+          if (hasDetails) {
+            detailsSection.className = 'details-section bg-blue-50 dark:bg-slate-800 rounded-lg px-4 text-sm text-blue-800 dark:text-blue-200';
+            detailsSection.innerHTML = `<p class="py-2">${item.details}</p>`;
+          }
 
           const noteSection = document.createElement('div');
           noteSection.className = 'note-section bg-gray-50 rounded-b-lg px-4';
@@ -429,35 +425,33 @@
           container.querySelectorAll('input[type="radio"]').forEach(r=>{
             r.addEventListener('click', (e)=>{
               const clicked = parseInt(e.target.value);
-              const current = item.status;
-              if(current===clicked){ handleStatusChange(item, 0); } else { handleStatusChange(item, clicked); }
+              handleStatusChange(item, item.status === clicked ? 0 : clicked);
             })
           })
 
-          container.querySelector('.note-toggle-btn').addEventListener('click', ()=>{
-            noteSection.classList.toggle('show');
-          })
+          if (hasDetails) {
+            container.querySelector('.details-toggle-btn').addEventListener('click', () => {
+              detailsSection.classList.toggle('show');
+            });
+          }
 
-          const workingToggle = container.querySelector('.working-toggle');
-          workingToggle.addEventListener('change', ()=>{
-            item.working = workingToggle.checked; item.lastUpdated = Date.now();
+          container.querySelector('.note-toggle-btn').addEventListener('click', ()=>{ noteSection.classList.toggle('show'); })
+          container.querySelector('.working-toggle').addEventListener('change', (e)=>{
+            item.working = e.target.checked; item.lastUpdated = Date.now();
             bumpRecent(item, item.label);
             renderTasks(); saveState(); updateSessionLine();
           })
-
           noteSection.querySelector('.note-save-btn').addEventListener('click', ()=>{
-            const v = noteSection.querySelector('textarea').value;
-            item.note = v; item.noteUpdated = Date.now();
+            item.note = noteSection.querySelector('textarea').value; item.noteUpdated = Date.now();
             saveState();
-            const info = noteSection.querySelector('.note-sticky-bar .mr-auto');
-            info.innerHTML = `<span class="text-[10px] text-slate-500">Son kaydetme: ${humanizeSince(item.noteUpdated)}</span>`;
+            noteSection.querySelector('.note-sticky-bar .mr-auto').innerHTML = `<span class="text-[10px] text-slate-500">Son kaydetme: ${humanizeSince(item.noteUpdated)}</span>`;
             item.lastUpdated = Date.now(); bumpRecent(item, item.label); renderTasks();
           })
 
           itemList.appendChild(container);
+          if (hasDetails) itemList.appendChild(detailsSection);
           itemList.appendChild(noteSection);
         })
-
         sectionDiv.appendChild(itemList);
         taskListContainer.appendChild(sectionDiv);
       })
@@ -468,7 +462,6 @@
       })
     }
 
-    // Confetti
     function confetti(durationMs=600){
       const canvas = $('#confetti-canvas');
       const ctx = canvas.getContext('2d');
@@ -479,18 +472,16 @@
       let start = performance.now();
       function step(t){
         const dt = t - start; ctx.clearRect(0,0,W,H);
-        parts.forEach(p=>{ p.x+=p.vx; p.y+=p.vy; p.a-=0.01; ctx.globalAlpha=Math.max(0,p.a); ctx.fillStyle=['#22c55e','#3b82f6','#f97316','#ca8a04'][Math.floor(Math.random()*4)]; ctx.fillRect(p.x,p.y,p.s,p.s); });
+        parts.forEach(p=>{ p.x+=p.vx; p.y+=p.vy; p.a-=0.01; ctx.globalAlpha=Math.max(0,p.a); ctx.fillStyle=['#22c55e','#f97316','#ca8a04', '#ef4444', '#8b5cf6'][Math.floor(Math.random()*5)]; ctx.fillRect(p.x,p.y,p.s,p.s); });
         if(dt < durationMs){ requestAnimationFrame(step); } else { ctx.clearRect(0,0,W,H); }
       }
       requestAnimationFrame(step);
     }
 
-    // Filtreler
     $$('.filter-btn').forEach(btn=>{
       btn.addEventListener('click', ()=>{ activeFilter = btn.dataset.filter; renderTasks(); });
     })
 
-    // Genel Notlar
     $('#board-note-add').addEventListener('click', ()=>{
       const inp = $('#board-note-input'); if(!inp.value.trim()) return;
       boardNotes.unshift({ text: inp.value.trim(), ts: Date.now() });
@@ -511,34 +502,40 @@
     });
 
     function buildNotesSummary(){
-      const wrap = $('#notes-summary'); wrap.innerHTML='';
-      tasks.forEach((sec, si)=>{
-        const notes = sec.items.filter(i=> (i.note||'').trim().length>0 );
-        if(!notes.length) return;
-        const box = document.createElement('div');
-        box.className='rounded border border-gray-200 bg-white dark:bg-slate-800 dark:border-slate-700';
-        const title = `${si+1}. ${sec.section}`;
-        const itemsHtml = notes.map(n=>`<li class="py-1"><span class="text-[11px] px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-700 mr-2">${n.label||n.id}</span>${n.note}</li>`).join('');
-        box.innerHTML = `<div class="px-3 py-2 text-sm font-semibold">${title}</div><ul class="px-3 pb-2 text-sm">${itemsHtml}</ul>`;
-        wrap.appendChild(box);
-      })
+      const wrap = $('#notes-summary'); 
+      wrap.innerHTML='<span class="text-xs text-gray-500 dark:text-slate-400">Tüm görev notlarının bir özeti aşağıda listelenir.</span>';
+      const allNotes = tasks.flatMap(s=>s.items).filter(i=> (i.note||'').trim().length > 0);
+      if(!allNotes.length) {
+          wrap.innerHTML = '<span class="text-xs text-gray-500 dark:text-slate-400">Henüz hiçbir göreve not eklenmemiş.</span>';
+          return;
+      }
+      
+      let html = '<ul class="mt-2 space-y-2">';
+      allNotes.forEach(n => {
+          html += `<li class="py-1"><b class="text-[11px] px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-700 mr-2">${n.label||n.id}</b>${n.note}</li>`;
+      });
+      html += '</ul>';
+      wrap.innerHTML = html;
     }
     
-    // Koyu Tema
+    $('#bulk-notes').addEventListener('toggle', (event) => {
+        if (event.target.open) {
+            buildNotesSummary();
+        }
+    });
+
     $('#dark-toggle').addEventListener('click', ()=>{
         const isDark = document.documentElement.classList.toggle('dark');
         $('#theme-icon-sun').classList.toggle('hidden', isDark);
         $('#theme-icon-moon').classList.toggle('hidden', !isDark);
     })
 
-    // İlk kurulum
     setupFirebase();
     if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
         document.documentElement.classList.add('dark');
         $('#theme-icon-sun').classList.add('hidden');
         $('#theme-icon-moon').classList.remove('hidden');
     }
-
   </script>
 </body>
 </html>
