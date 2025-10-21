@@ -100,6 +100,8 @@
       <div class="w-full bg-gray-200 rounded-full h-3">
         <div id="progress-bar" class="bg-green-500 h-3 rounded-full" style="width: 0%; transition: width .5s ease-in-out;"></div>
       </div>
+      <div id="detailed-summary" class="mt-2 text-center text-xs text-gray-500 dark:text-slate-400 flex flex-wrap justify-center gap-x-4 gap-y-1">
+      </div>
     </div>
     
     <!-- Filtreler -->
@@ -236,6 +238,18 @@
       const all = tasks.flatMap(s=>s.items);
       const completed = all.filter(i=>i.status===1||i.status===2).length;
       $('#session-line').textContent = `Toplam ${all.length} görevden ${completed} tanesi tamamlandı.`;
+      
+      const idle = all.filter(i => i.status === 0).length;
+      const waitBe = all.filter(i => i.status === 3).length;
+      const waitFe = all.filter(i => i.status === 4).length;
+      const summaryEl = $('#detailed-summary');
+      if (summaryEl) {
+          summaryEl.innerHTML = `
+              <span><b class="font-semibold text-gray-600 dark:text-slate-300">${idle}</b> boşta</span>
+              <span class="text-orange-600"><b class="font-semibold">${waitBe}</b> BE Bekliyor</span>
+              <span class="text-yellow-600"><b class="font-semibold">${waitFe}</b> FE Bekliyor</span>
+          `;
+      }
     }
 
     async function setupFirebase(){
@@ -370,6 +384,11 @@
 
           const infoBadge = item.lastUpdated ? `<span class="badge-updated text-[10px] px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-600 text-slate-600 dark:text-slate-300">${humanizeSince(item.lastUpdated)}</span>` : '';
           const workingBadge = item.working ? `<span class="text-[10px] px-2 py-0.5 rounded-full bg-violet-100 dark:bg-violet-900/50 text-violet-700 dark:text-violet-300">Çalışılıyor</span>` : '';
+          
+          const hasNote = item.note && item.note.trim() !== '';
+          const noteIconSVG = hasNote 
+              ? `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.94 8.94 0 01-4.062-.982 1 1 0 00-.874.195l-2.036.944a1 1 0 01-1.294-1.294l.944-2.036a1 1 0 00.195-.874A8.94 8.94 0 012 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9a1 1 0 11-2 0 1 1 0 012 0zm4 0a1 1 0 11-2 0 1 1 0 012 0zm4 0a1 1 0 11-2 0 1 1 0 012 0z" clip-rule="evenodd" /></svg>` 
+              : `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" /></svg>`;
 
           container.className = `task-item ${statusClass} ${workingClass} p-2 rounded-lg hover:bg-gray-50`;
           container.innerHTML = `
@@ -388,7 +407,7 @@
                 <div class="flex justify-center"><input type="radio" class="radio-be-awaiting-fe" name="status-${item.id}" value="4" title="Backend Tamamlandı, Frontend Bekleniyor" ${item.status===4?'checked':''}></div>
               </div>
               <button class="note-toggle-btn ml-2 text-gray-400 hover:text-blue-600 p-1 rounded-full" title="Not Ekle/Aç">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" /></svg>
+                ${noteIconSVG}
               </button>
             </div>
             <div class="mt-1 flex items-center gap-2 text-[11px] text-slate-500 dark:text-slate-400">
