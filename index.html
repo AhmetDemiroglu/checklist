@@ -12,10 +12,10 @@
     .task-item .task-text { transition: color 0.3s ease-in-out; }
     /* Durum Stilleri */
     .status-1 .task-text { text-decoration: line-through; text-decoration-color: #22c55e; text-decoration-thickness: 2px; color: #4ade80; } /* Tamamlandı */
-    .status-3 .task-text { color: #f97316; font-weight: 500; } /* Backend Bekleniyor */
-    .status-4 .task-text { color: #f59e0b; font-weight: 500; } /* Frontend Bekleniyor */
+    .status-3 .task-text { font-weight: 500; } /* Backend Bekleniyor */
+    .status-4 .task-text { font-weight: 500; } /* Frontend Bekleniyor */
     .status-5 .task-text { text-decoration: line-through; text-decoration-color: #dc2626; color: #f87171; } /* İptal - Belirgin Kırmızı */
-    .status-6 .task-text { color: #14b8a6; font-weight: 500; } /* Yanıt Bekleniyor - Yeni Renk: Teal */
+    .status-6 .task-text { color: #0ea5e9; font-weight: 500; } /* Yanıt Bekleniyor - Yeni Renk: Sky Blue */
 
     /* Dark Mode Kontrast İyileştirmeleri */
     .dark body { background-color:#0f172a; }
@@ -31,7 +31,7 @@
     .radio-3 { accent-color: #f97316; } .radio-3-wrap { border: 2px solid #fed7aa; }
     .radio-4 { accent-color: #f59e0b; } .radio-4-wrap { border: 2px solid #fde68a; }
     .radio-5 { accent-color: #dc2626; } .radio-5-wrap { border: 2px solid #fecaca; }
-    .radio-6 { accent-color: #14b8a6; } .radio-6-wrap { border: 2px solid #99f6e4; }
+    .radio-6 { accent-color: #0ea5e9; } .radio-6-wrap { border: 2px solid #bae6fd; }
 
     .details-section, .note-section { max-height: 0; overflow: hidden; transition: max-height .3s ease-out, padding .3s ease-out, background-color .2s; }
     .details-section.show, .note-section.show { max-height: 220px; padding-top: .5rem; padding-bottom: .75rem; }
@@ -103,7 +103,7 @@
         <button data-filter="3" class="filter-btn px-2 py-1 rounded bg-orange-100 text-orange-800 dark:bg-orange-900/50 dark:text-orange-300">Backend Bekleniyor</button>
         <button data-filter="4" class="filter-btn px-2 py-1 rounded bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300">Frontend Bekleniyor</button>
         <button data-filter="5" class="filter-btn px-2 py-1 rounded bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300">İptal</button>
-        <button data-filter="6" class="filter-btn px-2 py-1 rounded bg-teal-100 text-teal-800 dark:bg-teal-900/50 dark:text-teal-300">Yanıt Bekleniyor</button>
+        <button data-filter="6" class="filter-btn px-2 py-1 rounded bg-sky-100 text-sky-800 dark:bg-sky-900/50 dark:text-sky-300">Yanıt Bekleniyor</button>
         <button data-filter="working" class="filter-btn px-2 py-1 rounded bg-violet-100 text-violet-800 dark:bg-violet-900/50 dark:text-violet-300">Çalışılanlar</button>
     </div>
 
@@ -231,7 +231,7 @@
               <span class="text-violet-600 dark:text-violet-400"><b class="font-semibold">${workingOn}</b> Çalışılıyor</span>
               <span class="text-orange-600 dark:text-orange-400"><b class="font-semibold">${waitBe}</b> Backend Bekleniyor</span>
               <span class="text-yellow-600 dark:text-yellow-400"><b class="font-semibold">${waitFe}</b> Frontend Bekleniyor</span>
-              <span class="text-teal-600 dark:text-teal-400"><b class="font-semibold">${waitingReply}</b> Yanıt Bekleniyor</span>
+              <span class="text-sky-600 dark:text-sky-400"><b class="font-semibold">${waitingReply}</b> Yanıt Bekleniyor</span>
               <span class="text-red-600 dark:text-red-400"><b class="font-semibold">${canceled}</b> İptal</span>
           `;
       }
@@ -365,6 +365,13 @@
           const infoBadge = item.lastUpdated ? `<span class="badge-updated text-[10px] px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-600 text-slate-600 dark:text-slate-300">${humanizeSince(item.lastUpdated)}</span>` : '';
           const workingBadge = item.working ? `<span class="text-[10px] px-2 py-0.5 rounded-full bg-violet-100 dark:bg-violet-900/50 text-violet-700 dark:text-violet-300">Çalışılıyor</span>` : '';
           
+          let statusBadgeHTML = '';
+          if (item.status === 3) {
+            statusBadgeHTML = `<span class="ml-2 text-xs font-bold px-2 py-0.5 rounded-full bg-orange-100 text-orange-800 dark:bg-orange-900/50 dark:text-orange-300">BE</span>`;
+          } else if (item.status === 4) {
+            statusBadgeHTML = `<span class="ml-2 text-xs font-bold px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300">FE</span>`;
+          }
+          
           const hasNote = item.note && item.note.trim() !== '';
           const noteIconSVG = hasNote 
               ? `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.94 8.94 0 01-4.062-.982 1 1 0 00-.874.195l-2.036.944a1 1 0 01-1.294-1.294l.944-2.036a1 1 0 00.195-.874A8.94 8.94 0 012 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9a1 1 0 11-2 0 1 1 0 012 0zm4 0a1 1 0 11-2 0 1 1 0 012 0zm4 0a1 1 0 11-2 0 1 1 0 012 0z" clip-rule="evenodd" /></svg>` 
@@ -380,6 +387,7 @@
                 <b class="text-gray-500 mr-2">${displayLabel}.</b>
                 <span>${item.text}</span>
                 ${detailsIconHTML}
+                ${statusBadgeHTML}
               </span>
               <div class="task-aux flex items-center gap-2">
                 ${infoBadge}
@@ -468,7 +476,7 @@
       let start = performance.now();
       function step(t){
         const dt = t - start; ctx.clearRect(0,0,W,H);
-        parts.forEach(p=>{ p.x+=p.vx; p.y+=p.vy; p.a-=0.01; ctx.globalAlpha=Math.max(0,p.a); ctx.fillStyle=['#22c55e','#f97316','#f59e0b', '#dc2626', '#14b8a6'][Math.floor(Math.random()*5)]; ctx.fillRect(p.x,p.y,p.s,p.s); });
+        parts.forEach(p=>{ p.x+=p.vx; p.y+=p.vy; p.a-=0.01; ctx.globalAlpha=Math.max(0,p.a); ctx.fillStyle=['#22c55e','#f97316','#f59e0b', '#dc2626', '#0ea5e9'][Math.floor(Math.random()*5)]; ctx.fillRect(p.x,p.y,p.s,p.s); });
         if(dt < durationMs){ requestAnimationFrame(step); } else { ctx.clearRect(0,0,W,H); }
       }
       requestAnimationFrame(step);
@@ -535,3 +543,4 @@
   </script>
 </body>
 </html>
+
