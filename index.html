@@ -12,30 +12,25 @@
     .task-item .task-text { transition: color 0.3s ease-in-out; }
     /* Durum Stilleri */
     .status-1 .task-text { text-decoration: line-through; text-decoration-color: #22c55e; text-decoration-thickness: 2px; color: #4ade80; } /* Tamamlandı */
-    .status-3 .task-text { color: #f97316; font-weight: 500; } /* BE Bekleniyor */
-    .status-4 .task-text { color: #ca8a04; font-weight: 500; } /* FE Bekleniyor */
-    .status-5 .task-text { text-decoration: line-through; text-decoration-color: #ef4444; color: #f87171; } /* İptal */
+    .status-3 .task-text { color: #f97316; font-weight: 500; } /* Backend Bekleniyor */
+    .status-4 .task-text { color: #f59e0b; font-weight: 500; } /* Frontend Bekleniyor */
+    .status-5 .task-text { text-decoration: line-through; text-decoration-color: #dc2626; color: #f87171; } /* İptal */
     .status-6 .task-text { color: #8b5cf6; font-weight: 500; } /* Yanıt Bekleniyor */
 
     /* Dark Mode Kontrast İyileştirmeleri */
     .dark body { background-color:#0f172a; }
     .dark .card { background-color:#1e293b; color:#cbd5e1; border-color: #334155; }
     .dark .task-item:hover { background-color:#334155; }
-    .dark .text-gray-800 { color: #f1f5f9; }
-    .dark .text-gray-700 { color: #e2e8f0; }
-    .dark .text-gray-600 { color: #94a3b8; }
-    .dark .text-gray-500 { color: #64748b; }
-    .dark .border-gray-200 { border-color: #334155; }
-    .dark .bg-gray-50 { background-color: #334155; }
-    .dark .bg-slate-50 { background-color: #334155; }
+    .dark .text-gray-800 { color: #f1f5f9; } .dark .text-gray-700 { color: #e2e8f0; } .dark .text-gray-600 { color: #94a3b8; } .dark .text-gray-500 { color: #64748b; }
+    .dark .border-gray-200 { border-color: #334155; } .dark .bg-gray-50 { background-color: #334155; } .dark .bg-slate-50 { background-color: #334155; }
 
     .radio-buttons { display: grid; grid-template-columns: repeat(5, minmax(2.5rem,1fr)); gap: .5rem; min-width: 300px; margin-left: auto; padding-left: .5rem; }
     .radio-buttons input { cursor: pointer; width: 1.25rem; height: 1.25rem; }
-    .radio-1 { accent-color: #22c55e; }
-    .radio-3 { accent-color: #f97316; }
-    .radio-4 { accent-color: #ca8a04; }
-    .radio-5 { accent-color: #ef4444; }
-    .radio-6 { accent-color: #8b5cf6; }
+    .radio-1 { accent-color: #22c55e; } .radio-1-wrap { border: 1px solid #bbf7d0; }
+    .radio-3 { accent-color: #f97316; } .radio-3-wrap { border: 1px solid #fed7aa; }
+    .radio-4 { accent-color: #f59e0b; } .radio-4-wrap { border: 1px solid #fde68a; }
+    .radio-5 { accent-color: #dc2626; } .radio-5-wrap { border: 1px solid #fecaca; }
+    .radio-6 { accent-color: #8b5cf6; } .radio-6-wrap { border: 1px solid #ddd6fe; }
 
     .details-section, .note-section { max-height: 0; overflow: hidden; transition: max-height .3s ease-out, padding .3s ease-out, background-color .2s; }
     .details-section.show, .note-section.show { max-height: 220px; padding-top: .5rem; padding-bottom: .75rem; }
@@ -104,10 +99,10 @@
         <span class="font-semibold text-gray-700 dark:text-slate-300 mr-2">Filtrele:</span>
         <button data-filter="all" class="filter-btn px-2 py-1 rounded bg-slate-800 text-white">Tümü</button>
         <button data-filter="1" class="filter-btn px-2 py-1 rounded bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300">Tamamlandı</button>
-        <button data-filter="3" class="filter-btn px-2 py-1 rounded bg-orange-100 text-orange-800 dark:bg-orange-900/50 dark:text-orange-300">BE Bekliyor</button>
-        <button data-filter="4" class="filter-btn px-2 py-1 rounded bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300">FE Bekleniyor</button>
+        <button data-filter="3" class="filter-btn px-2 py-1 rounded bg-orange-100 text-orange-800 dark:bg-orange-900/50 dark:text-orange-300">Backend Bekleniyor</button>
+        <button data-filter="4" class="filter-btn px-2 py-1 rounded bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300">Frontend Bekleniyor</button>
         <button data-filter="5" class="filter-btn px-2 py-1 rounded bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300">İptal</button>
-        <button data-filter="6" class="filter-btn px-2 py-1 rounded bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-300">Yanıt Bekliyor</button>
+        <button data-filter="6" class="filter-btn px-2 py-1 rounded bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-300">Yanıt Bekleniyor</button>
         <button data-filter="working" class="filter-btn px-2 py-1 rounded bg-violet-100 text-violet-800 dark:bg-violet-900/50 dark:text-violet-300">Çalışılanlar</button>
     </div>
 
@@ -231,12 +226,12 @@
       const summaryEl = $('#detailed-summary');
       if (summaryEl) {
           summaryEl.innerHTML = `
-              <span><b class="font-semibold text-gray-600 dark:text-slate-300">${idle}</b> boşta</span>
-              <span class="text-violet-600 dark:text-violet-400"><b class="font-semibold">${workingOn}</b> çalışılıyor</span>
-              <span class="text-orange-600 dark:text-orange-400"><b class="font-semibold">${waitBe}</b> BE Bkl.</span>
-              <span class="text-yellow-600 dark:text-yellow-400"><b class="font-semibold">${waitFe}</b> FE Bkl.</span>
-              <span class="text-purple-600 dark:text-purple-400"><b class="font-semibold">${waitingReply}</b> yanıt bkl.</span>
-              <span class="text-red-600 dark:text-red-400"><b class="font-semibold">${canceled}</b> iptal</span>
+              <span><b class="font-semibold text-gray-600 dark:text-slate-300">${idle}</b> Boşta</span>
+              <span class="text-violet-600 dark:text-violet-400"><b class="font-semibold">${workingOn}</b> Çalışılıyor</span>
+              <span class="text-orange-600 dark:text-orange-400"><b class="font-semibold">${waitBe}</b> Backend Bekleniyor</span>
+              <span class="text-yellow-600 dark:text-yellow-400"><b class="font-semibold">${waitFe}</b> Frontend Bekleniyor</span>
+              <span class="text-purple-600 dark:text-purple-400"><b class="font-semibold">${waitingReply}</b> Yanıt Bekleniyor</span>
+              <span class="text-red-600 dark:text-red-400"><b class="font-semibold">${canceled}</b> İptal</span>
           `;
       }
     }
@@ -390,11 +385,11 @@
                 ${workingBadge}
               </div>
               <div class="radio-buttons">
-                <div class="flex justify-center"><input type="radio" class="radio-1" name="status-${item.id}" value="1" title="Tamamlandı" ${item.status===1?'checked':''}></div>
-                <div class="flex justify-center"><input type="radio" class="radio-3" name="status-${item.id}" value="3" title="BE Bekleniyor" ${item.status===3?'checked':''}></div>
-                <div class="flex justify-center"><input type="radio" class="radio-4" name="status-${item.id}" value="4" title="FE Bekleniyor" ${item.status===4?'checked':''}></div>
-                <div class="flex justify-center"><input type="radio" class="radio-5" name="status-${item.id}" value="5" title="İptal" ${item.status===5?'checked':''}></div>
-                <div class="flex justify-center"><input type="radio" class="radio-6" name="status-${item.id}" value="6" title="Yanıt Bekleniyor" ${item.status===6?'checked':''}></div>
+                  <div class="flex justify-center radio-1-wrap rounded-md p-1"><input type="radio" class="radio-1" name="status-${item.id}" value="1" title="Tamamlandı" ${item.status===1?'checked':''}></div>
+                  <div class="flex justify-center radio-3-wrap rounded-md p-1"><input type="radio" class="radio-3" name="status-${item.id}" value="3" title="Backend Bekleniyor" ${item.status===3?'checked':''}></div>
+                  <div class="flex justify-center radio-4-wrap rounded-md p-1"><input type="radio" class="radio-4" name="status-${item.id}" value="4" title="Frontend Bekleniyor" ${item.status===4?'checked':''}></div>
+                  <div class="flex justify-center radio-5-wrap rounded-md p-1"><input type="radio" class="radio-5" name="status-${item.id}" value="5" title="İptal" ${item.status===5?'checked':''}></div>
+                  <div class="flex justify-center radio-6-wrap rounded-md p-1"><input type="radio" class="radio-6" name="status-${item.id}" value="6" title="Yanıt Bekleniyor" ${item.status===6?'checked':''}></div>
               </div>
               <button class="note-toggle-btn ml-2 text-gray-400 hover:text-blue-600 p-1 rounded-full" title="Not Ekle/Aç">
                 ${noteIconSVG}
@@ -472,7 +467,7 @@
       let start = performance.now();
       function step(t){
         const dt = t - start; ctx.clearRect(0,0,W,H);
-        parts.forEach(p=>{ p.x+=p.vx; p.y+=p.vy; p.a-=0.01; ctx.globalAlpha=Math.max(0,p.a); ctx.fillStyle=['#22c55e','#f97316','#ca8a04', '#ef4444', '#8b5cf6'][Math.floor(Math.random()*5)]; ctx.fillRect(p.x,p.y,p.s,p.s); });
+        parts.forEach(p=>{ p.x+=p.vx; p.y+=p.vy; p.a-=0.01; ctx.globalAlpha=Math.max(0,p.a); ctx.fillStyle=['#22c55e','#f97316','#f59e0b', '#dc2626', '#8b5cf6'][Math.floor(Math.random()*5)]; ctx.fillRect(p.x,p.y,p.s,p.s); });
         if(dt < durationMs){ requestAnimationFrame(step); } else { ctx.clearRect(0,0,W,H); }
       }
       requestAnimationFrame(step);
@@ -539,4 +534,17 @@
   </script>
 </body>
 </html>
+" in the canvas.
+You have been asked to make the following changes to the canvas:
+
+- In the Canvas, update the following text from:
+`BE Bkl.` to `Backend Bekleniyor`
+
+- In the Canvas, update the following text from:
+`FE Bkl.` to `Frontend Bekleniyor`
+
+- In the Canvas, update the following text from:
+`yanıt bkl.` to `Yanıt Bekleniyor`
+
+Please respond in the Turkish language.
 
