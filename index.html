@@ -75,7 +75,8 @@
     .details-section.show, .note-section.show { max-height: 220px; padding-top: .5rem; padding-bottom: .75rem; }
     
     .note-sticky-bar { position: sticky; bottom: 0; display:flex; justify-content: flex-end; align-items: center; gap:.5rem; background: linear-gradient(180deg, rgba(249,250,251,0), rgba(249,250,251,1) 40%); padding-top:.5rem; }
-    .dark .note-sticky-bar { background: linear-gradient(180deg, rgba(30, 41, 59, 0), rgba(30, 41, 59, 1) 40%); } /* dark:bg-slate-800 gradient */
+    /* Not sticky bar'ın arka planı için koyu tema düzeltmesi */
+    .dark .note-sticky-bar { background: linear-gradient(180deg, rgba(51, 65, 85, 0), rgba(51, 65, 85, 1) 40%); } /* dark:bg-slate-700 gradient */
 
     .working-ring { box-shadow: 0 0 0 3px rgba(139,92,246,.25), 0 0 0 6px rgba(139,92,246,.12); animation: pulseGlow 1.2s ease-in-out infinite; border-radius: .75rem; }
     @keyframes pulseGlow { 0%{ box-shadow: 0 0 0 0 rgba(139,92,246,.35), 0 0 0 3px rgba(139,92,246,.12);} 50%{ box-shadow: 0 0 0 6px rgba(139,92,246,.25), 0 0 0 12px rgba(139,92,246,.08);} 100%{ box-shadow: 0 0 0 0 rgba(139,92,246,.0), 0 0 0 3px rgba(139,92,246,.0);} }
@@ -137,7 +138,7 @@
     
     <!-- Filtreler -->
     <div class="filter-bar mb-5 flex flex-wrap justify-center items-center gap-2 p-2 rounded-lg text-xs"> <!-- Renkler CSS'den gelecek -->
-        <span class="font-semibold text-gray-700 dark:text-slate-300 mr-2">Filtrele:</span>
+        <span class="font-semibold text-black dark:text-sky-600" mr-2">Filtreler:</span>
         <button data-filter="all" class="filter-btn px-2 py-1 rounded bg-slate-800 text-white dark:bg-slate-600 dark:hover:bg-slate-500">Tümü</button>
         <button data-filter="1" class="filter-btn px-2 py-1 rounded bg-green-200 text-green-800 dark:bg-green-700 dark:text-green-100">Tamamlandı</button>
         <button data-filter="3" class="filter-btn px-2 py-1 rounded bg-orange-200 text-orange-800 dark:bg-orange-700 dark:text-orange-100">Backend Bekleniyor</button>
@@ -598,8 +599,9 @@
 
     setupFirebase();
     // Tarayıcı tercihini otomatik algılayan kod tamamen kaldırıldı.
-    // Başlangıç temasını ve ikonunu ayarla (Her zaman açık başlar)
-    const isInitiallyDark = document.documentElement.classList.contains('dark'); // Bu her zaman false olmalı başta
+    // Başlangıçta ikonları doğru ayarla (Her zaman açık başlar)
+    const isInitiallyDark = false; // Başlangıçta her zaman açık tema
+    document.documentElement.classList.remove('dark'); // Başlangıçta dark sınıfını kaldır
     $('#theme-icon-sun').classList.toggle('hidden', isInitiallyDark);
     $('#theme-icon-moon').classList.toggle('hidden', !isInitiallyDark);
 
