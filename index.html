@@ -23,6 +23,23 @@
     .dark .task-item:hover { background-color:#334155; }
     .dark .text-gray-800 { color: #f1f5f9; } .dark .text-gray-700 { color: #e2e8f0; } .dark .text-gray-600 { color: #94a3b8; } .dark .text-gray-500 { color: #64748b; }
     .dark .border-gray-200 { border-color: #334155; } .dark .bg-gray-50 { background-color: #334155; } .dark .bg-slate-50 { background-color: #334155; }
+    .dark .bg-gray-100 { background-color: #334155; } /* Filtre çubuğu arka planı */
+
+    /* 1. Genel Notlar - Madde Rozetleri */
+    .dark #notes-summary .badge { background-color: #475569; color: #e2e8f0; } /* Güncellendi */
+    /* 2. Radio Butonlar */
+    .dark .radio-buttons input[type="radio"] { filter: invert(90%) hue-rotate(180deg); } /* Beyazı koyulaştır */
+    .dark .radio-1-wrap { border-color: #166534; background-color: rgba(34, 197, 94, 0.1);} /* Yeşil */
+    .dark .radio-3-wrap { border-color: #9a3412; background-color: rgba(249, 115, 22, 0.1);} /* Turuncu */
+    .dark .radio-4-wrap { border-color: #b45309; background-color: rgba(245, 158, 11, 0.1);} /* Sarı */
+    .dark .radio-5-wrap { border-color: #b91c1c; background-color: rgba(220, 38, 38, 0.1);} /* Kırmızı */
+    .dark .radio-6-wrap { border-color: #0369a1; background-color: rgba(14, 165, 233, 0.1);} /* Mavi */
+    /* 3. Not Alanı Textarea */
+    .dark .note-section textarea, .dark #board-note-input { background-color: #0f172a; border-color: #334155; color: #cbd5e1; }
+    .dark ::placeholder { color: #64748b; }
+    /* 4. "Üzerinde Çalışılıyor" Checkbox */
+    .dark .working-toggle { filter: invert(90%) hue-rotate(180deg); } /* Beyazı koyulaştır */
+
 
     .radio-buttons { display: grid; grid-template-columns: repeat(5, minmax(2.5rem,1fr)); gap: .5rem; min-width: 300px; margin-left: auto; padding-left: .5rem; }
     .radio-buttons input { cursor: pointer; width: 1.25rem; height: 1.25rem; }
@@ -71,13 +88,13 @@
       </div>
     </div>
 
-    <details id="bulk-notes" class="mb-1 sm:mb-3 rounded-lg border border-gray-200 bg-gray-50">
+    <details id="bulk-notes" class="mb-4 sm:mb-6 rounded-lg border border-gray-200 bg-gray-50">
       <summary class="cursor-pointer select-none px-3 py-2 sm:px-4 sm:py-3 text-sm sm:text-base font-semibold text-gray-700">Genel Notlar</summary>
-      <div class="p-2 sm:p-3 space-y-3">
+      <div class="p-3 sm:p-4 space-y-3">
         <div id="notes-summary" class="space-y-2 text-sm border-b border-gray-200 pb-1 mb-1"></div>
         <div>
           <div class="flex gap-2">
-            <input id="board-note-input" class="flex-1 rounded border border-gray-300 px-2 py-1 text-sm" placeholder="Paylaşımlı not ekle..." />
+            <input id="board-note-input" class="flex-1 rounded border border-gray-300 dark:border-slate-600 px-2 py-1 text-sm dark:bg-slate-700" placeholder="Paylaşımlı not ekle..." />
             <button id="board-note-add" class="text-xs px-3 py-1 rounded bg-blue-600 text-white hover:bg-blue-700">Ekle</button>
           </div>
           <ul id="board-notes-list" class="mt-2 space-y-1 text-xs"></ul>
@@ -96,15 +113,16 @@
       <div id="detailed-summary" class="mt-2 text-center text-xs text-gray-500 dark:text-slate-400 flex flex-wrap justify-center gap-x-4 gap-y-1"></div>
     </div>
     
+    <!-- Filtreler -->
     <div class="mb-5 flex flex-wrap justify-center items-center gap-2 p-2 rounded-lg bg-gray-100 dark:bg-slate-800 text-xs">
         <span class="font-semibold text-gray-700 dark:text-slate-300 mr-2">Filtrele:</span>
-        <button data-filter="all" class="filter-btn px-2 py-1 rounded bg-slate-800 text-white">Tümü</button>
-        <button data-filter="1" class="filter-btn px-2 py-1 rounded bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300">Tamamlandı</button>
-        <button data-filter="3" class="filter-btn px-2 py-1 rounded bg-orange-100 text-orange-800 dark:bg-orange-900/50 dark:text-orange-300">Backend Bekleniyor</button>
-        <button data-filter="4" class="filter-btn px-2 py-1 rounded bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300">Frontend Bekleniyor</button>
-        <button data-filter="5" class="filter-btn px-2 py-1 rounded bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300">İptal</button>
-        <button data-filter="6" class="filter-btn px-2 py-1 rounded bg-sky-100 text-sky-800 dark:bg-sky-900/50 dark:text-sky-300">Yanıt Bekleniyor</button>
-        <button data-filter="working" class="filter-btn px-2 py-1 rounded bg-violet-100 text-violet-800 dark:bg-violet-900/50 dark:text-violet-300">Çalışılanlar</button>
+        <button data-filter="all" class="filter-btn px-2 py-1 rounded bg-slate-800 text-white dark:bg-slate-600 dark:hover:bg-slate-500">Tümü</button>
+        <button data-filter="1" class="filter-btn px-2 py-1 rounded bg-green-200 text-green-800 dark:bg-green-700 dark:text-green-100">Tamamlandı</button>
+        <button data-filter="3" class="filter-btn px-2 py-1 rounded bg-orange-200 text-orange-800 dark:bg-orange-700 dark:text-orange-100">Backend Bekleniyor</button>
+        <button data-filter="4" class="filter-btn px-2 py-1 rounded bg-yellow-200 text-yellow-800 dark:bg-yellow-700 dark:text-yellow-100">Frontend Bekleniyor</button>
+        <button data-filter="5" class="filter-btn px-2 py-1 rounded bg-red-200 text-red-800 dark:bg-red-700 dark:text-red-100">İptal</button>
+        <button data-filter="6" class="filter-btn px-2 py-1 rounded bg-sky-200 text-sky-800 dark:bg-sky-700 dark:text-sky-100">Yanıt Bekleniyor</button>
+        <button data-filter="working" class="filter-btn px-2 py-1 rounded bg-violet-200 text-violet-800 dark:bg-violet-700 dark:text-violet-100">Çalışılıyor</button>
     </div>
 
     <div id="task-list" class="space-y-6"></div>
@@ -246,10 +264,10 @@
         await signInAnonymously(auth);
         listenForUpdates();
       }catch(err){
-        console.error(err);
+        console.error("Firebase Kurulum Hatası:", err); // Daha açıklayıcı log
         connectionStatus.classList.remove('hidden');
         connectionStatus.style.opacity = 1; connectionText.textContent = 'Bağlantı hatası. Ortak çalışma devre dışı.';
-        renderTasks();
+        renderTasks(); // Veritabanı olmasa da görevleri göster
       }
     }
 
@@ -272,6 +290,7 @@
         tasks.forEach(section=>{
           section.items.forEach(item=>{
             const saved = savedTasks.find(t=>t.id===item.id);
+             // Önce varsayılanları sıfırla ki silinen veriler temizlensin
             item.status = 0; item.note = ''; item.working = false; item.lastUpdated = 0; item.noteUpdated = 0;
             if(saved){
               item.status = typeof saved.status==='number'? saved.status : 0;
@@ -288,16 +307,34 @@
         updateProgress();
         updateSessionLine();
       }, (error)=>{
-        console.error('Firestore listener error:', error);
+        console.error('Firestore Dinleme Hatası:', error); // Daha açıklayıcı log
+        const statusDiv = connectionStatus.querySelector('div');
+        statusDiv.classList.add('bg-red-500');
+        statusDiv.classList.remove('bg-green-500','animate-pulse');
+        connectionText.textContent = 'Bağlantı Koptu';
+        connectionText.classList.add('text-red-600');
+        connectionStatus.style.opacity = 1;
+        // Bağlantı kopunca da görevleri son bilinen haliyle göster
+        renderTasks();
+        updateProgress();
+        updateSessionLine();
       })
     }
 
     async function saveState(){
-      if(!checklistDocRef || !isDataLoadedFromFirebase) return;
+      if(!checklistDocRef || !isDataLoadedFromFirebase) {
+        console.warn("Kaydetme engellendi: Veritabanı hazır değil veya ilk veri yüklenmedi.");
+        return;
+      }
       const stateToSave = tasks.flatMap(section => section.items.map(item => ({
         id:item.id, status:item.status||0, note:item.note||'', working:!!item.working, lastUpdated:item.lastUpdated||0, noteUpdated:item.noteUpdated||0
       })));
-      try{ await setDoc(checklistDocRef, { tasks: stateToSave, boardNotes }, { merge:true }); }catch(e){ console.error('Error saving state', e); }
+      try{
+        await setDoc(checklistDocRef, { tasks: stateToSave, boardNotes }, { merge:true });
+        // console.log("Durum başarıyla kaydedildi."); // Başarılı kaydetme logu
+      } catch(e){
+        console.error('Durum Kaydetme Hatası:', e); // Daha açıklayıcı log
+      }
     }
 
     function handleStatusChange(item, newStatus){
@@ -421,7 +458,7 @@
           noteSection.className = 'note-section bg-gray-50 rounded-b-lg px-4';
           const lastNote = item.noteUpdated ? `<span class="text-[10px] text-slate-500">Son kaydetme: ${humanizeSince(item.noteUpdated)}</span>` : '';
           noteSection.innerHTML = `
-            <textarea class="w-full p-2 border border-gray-300 rounded-md text-sm mt-2" placeholder="Notunuzu buraya ekleyin...">${item.note || ''}</textarea>
+            <textarea class="w-full p-2 border border-gray-300 dark:border-slate-600 dark:bg-slate-700 rounded-md text-sm mt-2" placeholder="Notunuzu buraya ekleyin...">${item.note || ''}</textarea>
             <div class="note-sticky-bar my-2">
               <div class="mr-auto">${lastNote}</div>
               <button class="note-save-btn text-sm bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600">Kaydet</button>
@@ -518,7 +555,8 @@
       
       let html = '<ul class="mt-2 space-y-2">';
       allNotes.forEach(n => {
-          html += `<li class="py-1"><b class="text-[11px] px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-700 mr-2">${n.label||n.id}</b>${n.note}</li>`;
+          // Genel Notlar içindeki madde rozetini (badge) span olarak değiştiriyoruz
+          html += `<li class="py-1"><span class="badge text-[11px] px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-700 mr-2 text-slate-700 dark:text-slate-200">${n.label||n.id}</span>${n.note}</li>`;
       });
       html += '</ul>';
       wrap.innerHTML = html;
@@ -537,11 +575,13 @@
     })
 
     setupFirebase();
-    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        document.documentElement.classList.add('dark');
-        $('#theme-icon-sun').classList.add('hidden');
-        $('#theme-icon-moon').classList.remove('hidden');
-    }
+    // Tarayıcı tercihini otomatik algılayan kod tamamen kaldırıldı.
+    // Başlangıç temasını ve ikonunu ayarla (Her zaman açık başlar)
+    const isInitiallyDark = document.documentElement.classList.contains('dark'); // Bu her zaman false olmalı başta
+    $('#theme-icon-sun').classList.toggle('hidden', isInitiallyDark);
+    $('#theme-icon-moon').classList.toggle('hidden', !isInitiallyDark);
+
+
   </script>
 </body>
 </html>
