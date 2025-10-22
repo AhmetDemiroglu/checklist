@@ -483,6 +483,9 @@
           };
           if(!matchByFilter(item)) return;
 
+          // GÖREV: Maddeler arası boşlukları eşitlemek için wrapper div eklendi
+          const itemWrapper = document.createElement('div');
+
           const container = document.createElement('div');
           container.setAttribute('data-task-id', item.id);
           const statusClass = `status-${item.status || 0}`; // status-0'ı da ekle
@@ -585,9 +588,11 @@
             item.lastUpdated = Date.now(); bumpRecent(item, item.label); renderTasks();
           })
 
-          itemList.appendChild(container);
-          if (hasDetails) itemList.appendChild(detailsSection);
-          itemList.appendChild(noteSection);
+          // GÖREV: Wrapper div'e append et
+          itemWrapper.appendChild(container);
+          if (hasDetails) itemWrapper.appendChild(detailsSection);
+          itemWrapper.appendChild(noteSection);
+          itemList.appendChild(itemWrapper); // Ana liste kabına wrapper'ı append et
         })
         sectionDiv.appendChild(itemList);
         taskListContainer.appendChild(sectionDiv);
@@ -680,3 +685,4 @@
   </script>
 </body>
 </html>
+
