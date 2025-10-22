@@ -31,10 +31,10 @@
     .dark body { background-color:#0f172a; color:#cbd5e1; } /* bg-slate-900, text-slate-300 */
     .dark .card { background-color:#1e293b; border-color: #334155; } /* dark:bg-slate-800 dark:border-slate-700 */
     .dark .task-item:hover { background-color:#334155; } /* dark:hover:bg-slate-700 */
-    .dark .filter-bar { background-color: #1e293b; } /* dark:bg-slate-800 */
-    .dark .note-section textarea, .dark #board-note-input { background-color: #0f172a; border-color: #475569; color: #cbd5e1; } /* dark:bg-slate-900 dark:border-slate-600 dark:text-slate-300 */
+    .dark .filter-bar { background-color: #1e293b; } /* dark:bg-slate-800 */ /* Filtre çubuğu arka planı DÜZELTİLDİ */
+    .dark .note-section textarea, .dark #board-note-input { background-color: #0f172a; border-color: #475569; color: #cbd5e1; } /* dark:bg-slate-900 dark:border-slate-600 dark:text-slate-300 */ /* Not Alanları DÜZELTİLDİ */
     .dark ::placeholder { color: #64748b; } /* dark:placeholder-slate-500 */
-    .dark .badge-updated { background-color: #475569; color: #cbd5e1; } /* dark:bg-slate-600 dark:text-slate-300 */
+    .dark .badge-updated { background-color: #475569; color: #cbd5e1; } /* dark:bg-slate-600 dark:text-slate-300 */ /* Tarih Rozeti DÜZELTİLDİ */
     .dark #notes-summary .badge { background-color: #475569; color: #e2e8f0; } /* dark:bg-slate-700 dark:text-slate-200 */
 
     /* Genel Renkler (Her iki tema için) */
@@ -125,7 +125,7 @@
     </div>
     
     <!-- Filtreler -->
-    <div class="filter-bar mb-5 flex flex-wrap justify-center items-center gap-2 p-2 rounded-lg bg-gray-100 text-xs">
+    <div class="filter-bar mb-5 flex flex-wrap justify-center items-center gap-2 p-2 rounded-lg text-xs">
         <span class="font-semibold text-gray-700 dark:text-slate-300 mr-2">Filtrele:</span>
         <button data-filter="all" class="filter-btn px-2 py-1 rounded bg-slate-800 text-white dark:bg-slate-600 dark:hover:bg-slate-500">Tümü</button>
         <button data-filter="1" class="filter-btn px-2 py-1 rounded bg-green-200 text-green-800 dark:bg-green-700 dark:text-green-100">Tamamlandı</button>
@@ -410,14 +410,14 @@
           const statusClass = `status-${item.status}`;
           const workingClass = item.working? 'working-ring' : '';
 
-          const infoBadge = item.lastUpdated ? `<span class="badge-updated text-[10px] px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-600 text-slate-600 dark:text-slate-300">${humanizeSince(item.lastUpdated)}</span>` : '';
+          const infoBadge = item.lastUpdated ? `<span class="badge-updated text-[10px] px-2 py-0.5 rounded-full">${humanizeSince(item.lastUpdated)}</span>` : ''; // Arka plan ve metin renkleri CSS'den gelecek
           const workingBadge = item.working ? `<span class="text-[10px] px-2 py-0.5 rounded-full bg-violet-100 dark:bg-violet-900/50 text-violet-700 dark:text-violet-300">Çalışılıyor</span>` : '';
           
           let statusBadgeHTML = '';
           if (item.status === 3) {
-            statusBadgeHTML = `<span class="ml-2 text-xs font-bold px-2 py-0.5 rounded-full bg-orange-100 text-orange-800 dark:bg-orange-900/50 dark:text-orange-300">BE Bekleniyor</span>`;
+            statusBadgeHTML = `<span class="ml-2 text-xs font-bold px-2 py-0.5 rounded-full bg-orange-100 text-orange-800 dark:bg-orange-900/50 dark:text-orange-300">Backend Bekleniyor</span>`;
           } else if (item.status === 4) {
-            statusBadgeHTML = `<span class="ml-2 text-xs font-bold px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300">FE Bekleniyor</span>`;
+            statusBadgeHTML = `<span class="ml-2 text-xs font-bold px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300">Frontend Bekleniyor</span>`;
           } else if (item.status === 6) {
             statusBadgeHTML = `<span class="ml-2 text-xs font-bold px-2 py-0.5 rounded-full bg-sky-100 text-sky-800 dark:bg-sky-900/50 dark:text-sky-300">Yanıt Bekleniyor</span>`;
           }
