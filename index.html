@@ -8,39 +8,42 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root { --glow: 0 0 0 0 rgba(0,0,0,0); }
-    body { font-family: 'Inter', sans-serif; background-color: #f8fafc; transition: background-color 0.3s; }
+    /* Açık Tema Varsayılanları */
+    body { font-family: 'Inter', sans-serif; background-color: #f8fafc; transition: background-color 0.3s; color: #1f2937; } /* text-gray-800 */
+    .card { background-color: #ffffff; border-color: #e5e7eb; } /* bg-white, border-gray-200 */
+    .task-item:hover { background-color: #f9fafb; } /* hover:bg-gray-50 */
+    .filter-bar { background-color: #f3f4f6; } /* bg-gray-100 */
+    .note-section textarea, #board-note-input { background-color: #ffffff; border-color: #d1d5db; color: #1f2937; } /* bg-white, border-gray-300 */
+     ::placeholder { color: #9ca3af; } /* placeholder-gray-400 */
+     .badge-updated { background-color: #e5e7eb; color: #4b5563;} /* bg-slate-200, text-slate-600 */
+     #notes-summary .badge { background-color: #e5e7eb; color: #374151; } /* bg-slate-200 text-slate-700 */
+
+
     .task-item .task-text { transition: color 0.3s ease-in-out; }
     /* Durum Stilleri */
     .status-1 .task-text { text-decoration: line-through; text-decoration-color: #22c55e; text-decoration-thickness: 2px; color: #4ade80; } /* Tamamlandı */
     .status-3 .task-text { font-weight: 500; } /* Backend Bekleniyor */
     .status-4 .task-text { font-weight: 500; } /* Frontend Bekleniyor */
     .status-5 .task-text { text-decoration: line-through; text-decoration-color: #dc2626; color: #f87171; } /* İptal - Belirgin Kırmızı */
-    .status-6 .task-text { color: #0ea5e9; font-weight: 500; } /* Yanıt Bekleniyor - Yeni Renk: Sky Blue */
+    .status-6 .task-text { color: #0ea5e9; font-weight: 500; } /* Yanıt Bekleniyor - Sky Blue */
 
-    /* Dark Mode Kontrast İyileştirmeleri */
-    .dark body { background-color:#0f172a; }
-    .dark .card { background-color:#1e293b; color:#cbd5e1; border-color: #334155; }
-    .dark .task-item:hover { background-color:#334155; }
-    .dark .text-gray-800 { color: #f1f5f9; } .dark .text-gray-700 { color: #e2e8f0; } .dark .text-gray-600 { color: #94a3b8; } .dark .text-gray-500 { color: #64748b; }
-    .dark .border-gray-200 { border-color: #334155; } .dark .bg-gray-50 { background-color: #334155; } .dark .bg-slate-50 { background-color: #334155; }
-    .dark .bg-gray-100 { background-color: #334155; } /* Filtre çubuğu arka planı */
+    /* Koyu Tema Stilleri */
+    .dark body { background-color:#0f172a; color:#cbd5e1; } /* bg-slate-900, text-slate-300 */
+    .dark .card { background-color:#1e293b; border-color: #334155; } /* dark:bg-slate-800 dark:border-slate-700 */
+    .dark .task-item:hover { background-color:#334155; } /* dark:hover:bg-slate-700 */
+    .dark .filter-bar { background-color: #1e293b; } /* dark:bg-slate-800 */
+    .dark .note-section textarea, .dark #board-note-input { background-color: #0f172a; border-color: #475569; color: #cbd5e1; } /* dark:bg-slate-900 dark:border-slate-600 dark:text-slate-300 */
+    .dark ::placeholder { color: #64748b; } /* dark:placeholder-slate-500 */
+    .dark .badge-updated { background-color: #475569; color: #cbd5e1; } /* dark:bg-slate-600 dark:text-slate-300 */
+    .dark #notes-summary .badge { background-color: #475569; color: #e2e8f0; } /* dark:bg-slate-700 dark:text-slate-200 */
 
-    /* 1. Genel Notlar - Madde Rozetleri */
-    .dark #notes-summary .badge { background-color: #475569; color: #e2e8f0; } /* Güncellendi */
-    /* 2. Radio Butonlar */
-    .dark .radio-buttons input[type="radio"] { filter: invert(90%) hue-rotate(180deg); } /* Beyazı koyulaştır */
-    .dark .radio-1-wrap { border-color: #166534; background-color: rgba(34, 197, 94, 0.1);} /* Yeşil */
-    .dark .radio-3-wrap { border-color: #9a3412; background-color: rgba(249, 115, 22, 0.1);} /* Turuncu */
-    .dark .radio-4-wrap { border-color: #b45309; background-color: rgba(245, 158, 11, 0.1);} /* Sarı */
-    .dark .radio-5-wrap { border-color: #b91c1c; background-color: rgba(220, 38, 38, 0.1);} /* Kırmızı */
-    .dark .radio-6-wrap { border-color: #0369a1; background-color: rgba(14, 165, 233, 0.1);} /* Mavi */
-    /* 3. Not Alanı Textarea */
-    .dark .note-section textarea, .dark #board-note-input { background-color: #0f172a; border-color: #334155; color: #cbd5e1; }
-    .dark ::placeholder { color: #64748b; }
-    /* 4. "Üzerinde Çalışılıyor" Checkbox */
-    .dark .working-toggle { filter: invert(90%) hue-rotate(180deg); } /* Beyazı koyulaştır */
+    /* Genel Renkler (Her iki tema için) */
+    .dark .text-gray-800, .dark .text-gray-700 { color: #f1f5f9; } /* Koyu temadaki ana metin */
+    .dark .text-gray-600, .dark .text-gray-500 { color: #94a3b8; } /* Koyu temadaki ikincil metin */
+    .dark .border-gray-200 { border-color: #334155; }
+    .dark .bg-gray-50, .dark .bg-slate-50 { background-color: #334155; }
 
-
+    #connection-status { transition: opacity 0.5s; }
     .radio-buttons { display: grid; grid-template-columns: repeat(5, minmax(2.5rem,1fr)); gap: .5rem; min-width: 300px; margin-left: auto; padding-left: .5rem; }
     .radio-buttons input { cursor: pointer; width: 1.25rem; height: 1.25rem; }
     /* Radio Buton Çerçeveleri */
@@ -49,17 +52,25 @@
     .radio-4 { accent-color: #f59e0b; } .radio-4-wrap { border: 2px solid #fde68a; }
     .radio-5 { accent-color: #dc2626; } .radio-5-wrap { border: 2px solid #fecaca; }
     .radio-6 { accent-color: #0ea5e9; } .radio-6-wrap { border: 2px solid #bae6fd; }
+    .dark .radio-buttons input[type="radio"] { filter: invert(90%) hue-rotate(180deg); } /* Beyazı koyulaştır */
+    .dark .radio-1-wrap { border-color: #166534; background-color: rgba(34, 197, 94, 0.1);} /* Yeşil */
+    .dark .radio-3-wrap { border-color: #9a3412; background-color: rgba(249, 115, 22, 0.1);} /* Turuncu */
+    .dark .radio-4-wrap { border-color: #b45309; background-color: rgba(245, 158, 11, 0.1);} /* Sarı */
+    .dark .radio-5-wrap { border-color: #b91c1c; background-color: rgba(220, 38, 38, 0.1);} /* Kırmızı */
+    .dark .radio-6-wrap { border-color: #0369a1; background-color: rgba(14, 165, 233, 0.1);} /* Mavi */
+
 
     .details-section, .note-section { max-height: 0; overflow: hidden; transition: max-height .3s ease-out, padding .3s ease-out, background-color .2s; }
     .details-section.show, .note-section.show { max-height: 220px; padding-top: .5rem; padding-bottom: .75rem; }
     
     .note-sticky-bar { position: sticky; bottom: 0; display:flex; justify-content: flex-end; align-items: center; gap:.5rem; background: linear-gradient(180deg, rgba(249,250,251,0), rgba(249,250,251,1) 40%); padding-top:.5rem; }
-    .dark .note-sticky-bar { background: linear-gradient(180deg, rgba(51,65,85,0), rgba(51,65,85,1) 40%); }
+    .dark .note-sticky-bar { background: linear-gradient(180deg, rgba(30, 41, 59, 0), rgba(30, 41, 59, 1) 40%); } /* dark:bg-slate-800 gradient */
 
     .working-ring { box-shadow: 0 0 0 3px rgba(139,92,246,.25), 0 0 0 6px rgba(139,92,246,.12); animation: pulseGlow 1.2s ease-in-out infinite; border-radius: .75rem; }
     @keyframes pulseGlow { 0%{ box-shadow: 0 0 0 0 rgba(139,92,246,.35), 0 0 0 3px rgba(139,92,246,.12);} 50%{ box-shadow: 0 0 0 6px rgba(139,92,246,.25), 0 0 0 12px rgba(139,92,246,.08);} 100%{ box-shadow: 0 0 0 0 rgba(139,92,246,.0), 0 0 0 3px rgba(139,92,246,.0);} }
     
     #confetti-canvas { position: fixed; top: 0; right: 0; width: 100%; height: 100%; pointer-events: none; z-index: 40; }
+    .dark .working-toggle { filter: invert(90%) hue-rotate(180deg); }
 
     @media (max-width: 768px){
       .task-row { flex-direction: column; align-items: stretch; gap: .5rem; }
@@ -114,7 +125,7 @@
     </div>
     
     <!-- Filtreler -->
-    <div class="mb-5 flex flex-wrap justify-center items-center gap-2 p-2 rounded-lg bg-gray-100 dark:bg-slate-800 text-xs">
+    <div class="filter-bar mb-5 flex flex-wrap justify-center items-center gap-2 p-2 rounded-lg bg-gray-100 text-xs">
         <span class="font-semibold text-gray-700 dark:text-slate-300 mr-2">Filtrele:</span>
         <button data-filter="all" class="filter-btn px-2 py-1 rounded bg-slate-800 text-white dark:bg-slate-600 dark:hover:bg-slate-500">Tümü</button>
         <button data-filter="1" class="filter-btn px-2 py-1 rounded bg-green-200 text-green-800 dark:bg-green-700 dark:text-green-100">Tamamlandı</button>
@@ -122,7 +133,7 @@
         <button data-filter="4" class="filter-btn px-2 py-1 rounded bg-yellow-200 text-yellow-800 dark:bg-yellow-700 dark:text-yellow-100">Frontend Bekleniyor</button>
         <button data-filter="5" class="filter-btn px-2 py-1 rounded bg-red-200 text-red-800 dark:bg-red-700 dark:text-red-100">İptal</button>
         <button data-filter="6" class="filter-btn px-2 py-1 rounded bg-sky-200 text-sky-800 dark:bg-sky-700 dark:text-sky-100">Yanıt Bekleniyor</button>
-        <button data-filter="working" class="filter-btn px-2 py-1 rounded bg-violet-200 text-violet-800 dark:bg-violet-700 dark:text-violet-100">Çalışılıyor</button>
+        <button data-filter="working" class="filter-btn px-2 py-1 rounded bg-violet-200 text-violet-800 dark:bg-violet-700 dark:text-violet-100">Çalışılanlar</button>
     </div>
 
     <div id="task-list" class="space-y-6"></div>
@@ -546,7 +557,7 @@
 
     function buildNotesSummary(){
       const wrap = $('#notes-summary'); 
-      wrap.innerHTML='<span class="text-xs text-gray-500 dark:text-slate-400">Tüm görev notlarının bir özeti aşağıda listelenir.</span>';
+      // wrap.innerHTML='<span class="text-xs text-gray-500 dark:text-slate-400">Tüm görev notlarının bir özeti aşağıda listelenir.</span>'; // Kaldırıldı
       const allNotes = tasks.flatMap(s=>s.items).filter(i=> (i.note||'').trim().length > 0);
       if(!allNotes.length) {
           wrap.innerHTML = '<span class="text-xs text-gray-500 dark:text-slate-400">Henüz hiçbir göreve not eklenmemiş.</span>';
@@ -555,7 +566,7 @@
       
       let html = '<ul class="mt-2 space-y-2">';
       allNotes.forEach(n => {
-          // Genel Notlar içindeki madde rozetini (badge) span olarak değiştiriyoruz
+          // Genel Notlar içindeki madde rozetini (badge) span olarak değiştiriyoruz ve dark mode sınıfı ekliyoruz
           html += `<li class="py-1"><span class="badge text-[11px] px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-700 mr-2 text-slate-700 dark:text-slate-200">${n.label||n.id}</span>${n.note}</li>`;
       });
       html += '</ul>';
