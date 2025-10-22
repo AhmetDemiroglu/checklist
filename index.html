@@ -15,8 +15,13 @@
     .filter-bar { background-color: #f3f4f6; } /* bg-gray-100 */
     .note-section textarea, #board-note-input { background-color: #ffffff; border-color: #d1d5db; color: #1f2937; } /* bg-white, border-gray-300 */
      ::placeholder { color: #9ca3af; } /* placeholder-gray-400 */
-     .badge-updated { background-color: #e5e7eb; color: #4b5563;} /* bg-slate-200, text-slate-600 */
+     .badge-updated { background-color: #e5e7eb; color: #4b5563;} /* Açık Tema: bg-slate-200, text-slate-600 */
      #notes-summary .badge { background-color: #e5e7eb; color: #374151; } /* bg-slate-200 text-slate-700 */
+     /* Not kaydetme tarihi alanı (Açık Tema) */
+     .note-sticky-bar span { color: #6b7280; } /* text-slate-500 */
+     /* Tema değiştirme ikonu (Açık Tema) */
+     #dark-toggle { background-color: #e5e7eb; color: #4b5563; } /* bg-slate-200 text-slate-600 */
+     #dark-toggle:hover { background-color: #d1d5db; } /* hover:bg-slate-300 */
 
 
     .task-item .task-text { transition: color 0.3s ease-in-out; }
@@ -31,11 +36,17 @@
     .dark body { background-color:#0f172a; color:#cbd5e1; } /* bg-slate-900, text-slate-300 */
     .dark .card { background-color:#1e293b; border-color: #334155; } /* dark:bg-slate-800 dark:border-slate-700 */
     .dark .task-item:hover { background-color:#334155; } /* dark:hover:bg-slate-700 */
-    .dark .filter-bar { background-color: #1e293b; } /* dark:bg-slate-800 */ /* Filtre çubuğu arka planı DÜZELTİLDİ */
-    .dark .note-section textarea, .dark #board-note-input { background-color: #0f172a; border-color: #475569; color: #cbd5e1; } /* dark:bg-slate-900 dark:border-slate-600 dark:text-slate-300 */ /* Not Alanları DÜZELTİLDİ */
+    .dark .filter-bar { background-color: #1e293b; } /* dark:bg-slate-800 */
+    .dark .note-section textarea, .dark #board-note-input { background-color: #0f172a; border-color: #475569; color: #cbd5e1; } /* dark:bg-slate-900 dark:border-slate-600 dark:text-slate-300 */
     .dark ::placeholder { color: #64748b; } /* dark:placeholder-slate-500 */
-    .dark .badge-updated { background-color: #475569; color: #cbd5e1; } /* dark:bg-slate-600 dark:text-slate-300 */ /* Tarih Rozeti DÜZELTİLDİ */
+    .dark .badge-updated { background-color: #475569; color: #cbd5e1; } /* Koyu Tema: dark:bg-slate-600 dark:text-slate-300 */
     .dark #notes-summary .badge { background-color: #475569; color: #e2e8f0; } /* dark:bg-slate-700 dark:text-slate-200 */
+    /* Not kaydetme tarihi alanı (Koyu Tema) DÜZELTİLDİ */
+     .dark .note-sticky-bar span { color: #94a3b8; } /* dark:text-slate-400 */
+     /* Tema değiştirme ikonu (Koyu Tema) DÜZELTİLDİ */
+     .dark #dark-toggle { background-color: #334155; color: #cbd5e1; } /* dark:bg-slate-700 dark:text-slate-300 */
+     .dark #dark-toggle:hover { background-color: #475569; } /* dark:hover:bg-slate-600 */
+
 
     /* Genel Renkler (Her iki tema için) */
     .dark .text-gray-800, .dark .text-gray-700 { color: #f1f5f9; } /* Koyu temadaki ana metin */
@@ -88,7 +99,7 @@
         <p id="motto" class="text-gray-500 mt-1">Geliştirme ve iyileştirme görevlerinin canlı takip listesi.</p>
       </div>
       <div class="flex items-center gap-3">
-        <button id="dark-toggle" class="p-2 rounded-lg bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-600" title="Temayı Değiştir">
+        <button id="dark-toggle" class="p-2 rounded-lg" title="Temayı Değiştir"> <!-- Renkler CSS'den gelecek -->
             <svg id="theme-icon-sun" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.707.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm-.707 8.486a1 1 0 011.414 0l.707-.707a1 1 0 01-1.414-1.414l-.707.707zM3 11a1 1 0 100-2H2a1 1 0 100 2h1z" clip-rule="evenodd" /></svg>
             <svg id="theme-icon-moon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 hidden" viewBox="0 0 20 20" fill="currentColor"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" /></svg>
         </button>
@@ -125,7 +136,7 @@
     </div>
     
     <!-- Filtreler -->
-    <div class="filter-bar mb-5 flex flex-wrap justify-center items-center gap-2 p-2 rounded-lg text-xs">
+    <div class="filter-bar mb-5 flex flex-wrap justify-center items-center gap-2 p-2 rounded-lg text-xs"> <!-- Renkler CSS'den gelecek -->
         <span class="font-semibold text-gray-700 dark:text-slate-300 mr-2">Filtrele:</span>
         <button data-filter="all" class="filter-btn px-2 py-1 rounded bg-slate-800 text-white dark:bg-slate-600 dark:hover:bg-slate-500">Tümü</button>
         <button data-filter="1" class="filter-btn px-2 py-1 rounded bg-green-200 text-green-800 dark:bg-green-700 dark:text-green-100">Tamamlandı</button>
