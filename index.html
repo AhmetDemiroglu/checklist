@@ -9,54 +9,43 @@
   <style>
     :root { --glow: 0 0 0 0 rgba(0,0,0,0); }
     /* Açık Tema Varsayılanları */
-    body { font-family: 'Inter', sans-serif; background-color: #f8fafc; transition: background-color 0.3s; color: #1f2937; } /* text-gray-800 */
-    .card { background-color: #ffffff; border-color: #e5e7eb; } /* bg-white, border-gray-200 */
-    
-    /* GÖREV 3: .task-item:hover kaldırıldı, çünkü artık duruma göre renk alacak */
-    /* .task-item:hover { background-color: #f9fafb; } /* hover:bg-gray-50 */ 
-
-    .filter-bar { background-color: #f3f4f6; } /* bg-gray-100 */
-    .note-section textarea, #board-note-input { background-color: #ffffff; border-color: #d1d5db; color: #1f2937; } /* bg-white, border-gray-300 */
-     ::placeholder { color: #9ca3af; } /* placeholder-gray-400 */
-     .badge-updated { background-color: #e5e7eb; color: #4b5563;} /* Açık Tema: bg-slate-200, text-slate-600 */
-     #notes-summary .badge { background-color: #e5e7eb; color: #374151; } /* bg-slate-200 text-slate-700 */
-     /* Not kaydetme tarihi alanı (Açık Tema) */
-     .note-sticky-bar span { color: #6b7280; } /* text-slate-500 */
-     /* Tema değiştirme ikonu (Açık Tema) */
-     #dark-toggle { background-color: #e5e7eb; color: #4b5563; } /* bg-slate-200 text-slate-600 */
-     #dark-toggle:hover { background-color: #d1d5db; } /* hover:bg-slate-300 */
-
+    body { font-family: 'Inter', sans-serif; background-color: #f8fafc; transition: background-color 0.3s; color: #1f2937; }
+    .card { background-color: #ffffff; border-color: #e5e7eb; }
+    /* GÖREV 3: .task-item:hover kaldırıldı */
+    /* .task-item:hover { background-color: #f9fafb; } */
+    .filter-bar { background-color: #f3f4f6; }
+    .note-section textarea, #board-note-input { background-color: #ffffff; border-color: #d1d5db; color: #1f2937; }
+    ::placeholder { color: #9ca3af; }
+    .badge-updated { background-color: #e5e7eb; color: #4b5563;}
+    #notes-summary .badge { background-color: #e5e7eb; color: #374151; }
+    .note-sticky-bar span { color: #6b7280; }
+    #dark-toggle { background-color: #e5e7eb; color: #4b5563; }
+    #dark-toggle:hover { background-color: #d1d5db; }
 
     .task-item .task-text { transition: color 0.3s ease-in-out; }
     /* Durum Stilleri */
-    .status-1 .task-text { text-decoration: line-through; text-decoration-color: #22c55e; text-decoration-thickness: 2px; color: #4ade80; } /* Tamamlandı */
-    .status-3 .task-text { font-weight: 500; } /* Backend Bekleniyor */
-    .status-4 .task-text { font-weight: 500; } /* Frontend Bekleniyor */
-    .status-5 .task-text { text-decoration: line-through; text-decoration-color: #dc2626; color: #f87171; } /* İptal - Belirgin Kırmızı */
-    .status-6 .task-text { color: #0ea5e9; font-weight: 500; } /* Yanıt Bekleniyor - Sky Blue */
+    .status-1 .task-text { text-decoration: line-through; text-decoration-color: #22c55e; text-decoration-thickness: 2px; color: #4ade80; }
+    .status-3 .task-text { font-weight: 500; }
+    .status-4 .task-text { font-weight: 500; }
+    .status-5 .task-text { text-decoration: line-through; text-decoration-color: #dc2626; color: #f87171; }
+    .status-6 .task-text { color: #0ea5e9; font-weight: 500; }
 
     /* Koyu Tema Stilleri */
-    .dark body { background-color:#0f172a; color:#cbd5e1; } /* bg-slate-900, text-slate-300 */
-    .dark .card { background-color:#1e293b; border-color: #334155; } /* dark:bg-slate-800 dark:border-slate-700 */
-    
-    /* GÖREV 3: .task-item:hover kaldırıldı */
-    /* .dark .task-item:hover { background-color:#334155; } /* dark:hover:bg-slate-700 */
-
-    .dark .filter-bar { background-color: #1e293b; } /* dark:bg-slate-800 */
-    .dark .note-section textarea, .dark #board-note-input { background-color: #0f172a; border-color: #475569; color: #cbd5e1; } /* dark:bg-slate-900 dark:border-slate-600 dark:text-slate-300 */
-    .dark ::placeholder { color: #64748b; } /* dark:placeholder-slate-500 */
-    .dark .badge-updated { background-color: #475569; color: #cbd5e1; } /* Koyu Tema: dark:bg-slate-600 dark:text-slate-300 */
-    .dark #notes-summary .badge { background-color: #475569; color: #e2e8f0; } /* dark:bg-slate-700 dark:text-slate-200 */
-    /* Not kaydetme tarihi alanı (Koyu Tema) DÜZELTİLDİ */
-     .dark .note-sticky-bar span { color: #94a3b8; } /* dark:text-slate-400 */
-     /* Tema değiştirme ikonu (Koyu Tema) DÜZELTİLDİ */
-     .dark #dark-toggle { background-color: #334155; color: #cbd5e1; } /* dark:bg-slate-700 dark:text-slate-300 */
-     .dark #dark-toggle:hover { background-color: #475569; } /* dark:hover:bg-slate-600 */
-
+    .dark body { background-color:#0f172a; color:#cbd5e1; }
+    .dark .card { background-color:#1e293b; border-color: #334155; }
+    /* .dark .task-item:hover { background-color:#334155; } */
+    .dark .filter-bar { background-color: #1e293b; }
+    .dark .note-section textarea, .dark #board-note-input { background-color: #0f172a; border-color: #475569; color: #cbd5e1; }
+    .dark ::placeholder { color: #64748b; }
+    .dark .badge-updated { background-color: #475569; color: #cbd5e1; }
+    .dark #notes-summary .badge { background-color: #475569; color: #e2e8f0; }
+    .dark .note-sticky-bar span { color: #94a3b8; }
+    .dark #dark-toggle { background-color: #334155; color: #cbd5e1; }
+    .dark #dark-toggle:hover { background-color: #475569; }
 
     /* Genel Renkler (Her iki tema için) */
-    .dark .text-gray-800, .dark .text-gray-700 { color: #f1f5f9; } /* Koyu temadaki ana metin */
-    .dark .text-gray-600, .dark .text-gray-500 { color: #94a3b8; } /* Koyu temadaki ikincil metin */
+    .dark .text-gray-800, .dark .text-gray-700 { color: #f1f5f9; }
+    .dark .text-gray-600, .dark .text-gray-500 { color: #94a3b8; }
     .dark .border-gray-200 { border-color: #334155; }
     .dark .bg-gray-50, .dark .bg-slate-50 { background-color: #334155; }
 
@@ -69,84 +58,62 @@
     .radio-4 { accent-color: #f59e0b; } .radio-4-wrap { border: 2px solid #fde68a; }
     .radio-5 { accent-color: #dc2626; } .radio-5-wrap { border: 2px solid #fecaca; }
     .radio-6 { accent-color: #0ea5e9; } .radio-6-wrap { border: 2px solid #bae6fd; }
-    .dark .radio-buttons input[type="radio"] { filter: invert(90%) hue-rotate(180deg); } /* Beyazı koyulaştır */
-    .dark .radio-1-wrap { border-color: #166534; background-color: rgba(34, 197, 94, 0.1);} /* Yeşil */
-    .dark .radio-3-wrap { border-color: #9a3412; background-color: rgba(249, 115, 22, 0.1);} /* Turuncu */
-    .dark .radio-4-wrap { border-color: #b45309; background-color: rgba(245, 158, 11, 0.1);} /* Sarı */
-    .dark .radio-5-wrap { border-color: #b91c1c; background-color: rgba(220, 38, 38, 0.1);} /* Kırmızı */
-    .dark .radio-6-wrap { border-color: #0369a1; background-color: rgba(14, 165, 233, 0.1);} /* Mavi */
+    .dark .radio-buttons input[type="radio"] { filter: invert(90%) hue-rotate(180deg); }
+    .dark .radio-1-wrap { border-color: #166534; background-color: rgba(34, 197, 94, 0.1);} 
+    .dark .radio-3-wrap { border-color: #9a3412; background-color: rgba(249, 115, 22, 0.1);} 
+    .dark .radio-4-wrap { border-color: #b45309; background-color: rgba(245, 158, 11, 0.1);} 
+    .dark .radio-5-wrap { border-color: #b91c1c; background-color: rgba(220, 38, 38, 0.1);} 
+    .dark .radio-6-wrap { border-color: #0369a1; background-color: rgba(14, 165, 233, 0.1);} 
 
-
-    /* GÖREV 1: Details-section renkleri düzeltildi */
-    .details-section {
-        max-height: 0; overflow: hidden; transition: max-height .3s ease-out, padding .3s ease-out, background-color .2s;
-        background-color: #f3f4f6; /* bg-gray-100 */
-        color: #374151; /* text-gray-700 */
-    }
-    .dark .details-section {
-        background-color: #334155; /* dark:bg-slate-700 */
-        color: #cbd5e1; /* dark:text-slate-300 */
-    }
+    /* GÖREV 1: Details-section renkleri */
+    .details-section { max-height: 0; overflow: hidden; transition: max-height .3s ease-out, padding .3s ease-out, background-color .2s; background-color: #f3f4f6; color: #374151; }
+    .dark .details-section { background-color: #334155; color: #cbd5e1; }
     .details-section.show, .note-section.show { max-height: 220px; padding-top: .5rem; padding-bottom: .75rem; }
     .note-section { max-height: 0; overflow: hidden; transition: max-height .3s ease-out, padding .3s ease-out, background-color .2s; }
-    
+
     .note-sticky-bar { position: sticky; bottom: 0; display:flex; justify-content: flex-end; align-items: center; gap:.5rem; background: linear-gradient(180deg, rgba(249,250,251,0), rgba(249,250,251,1) 40%); padding-top:.5rem; }
-    /* Not sticky bar'ın arka planı için koyu tema düzeltmesi */
-    .dark .note-sticky-bar { background: linear-gradient(180deg, rgba(51, 65, 85, 0), rgba(51, 65, 85, 1) 40%); } /* dark:bg-slate-700 gradient */
+    .dark .note-sticky-bar { background: linear-gradient(180deg, rgba(51, 65, 85, 0), rgba(51, 65, 85, 1) 40%); }
 
     .working-ring { box-shadow: 0 0 0 3px rgba(139,92,246,.25), 0 0 0 6px rgba(139,92,246,.12); animation: pulseGlow 1.2s ease-in-out infinite; border-radius: .75rem; }
     @keyframes pulseGlow { 0%{ box-shadow: 0 0 0 0 rgba(139,92,246,.35), 0 0 0 3px rgba(139,92,246,.12);} 50%{ box-shadow: 0 0 0 6px rgba(139,92,246,.25), 0 0 0 12px rgba(139,92,246,.08);} 100%{ box-shadow: 0 0 0 0 rgba(139,92,246,.0), 0 0 0 3px rgba(139,92,246,.0);} }
-    
+
     #confetti-canvas { position: fixed; top: 0; right: 0; width: 100%; height: 100%; pointer-events: none; z-index: 40; }
     .dark .working-toggle { filter: invert(90%) hue-rotate(180deg); }
 
     /* GÖREV 3: .task-item için kenarlık ve durum bazlı arkaplan stilleri */
-    .task-item {
-        border: 1px solid #e5e7eb; /* border-gray-200 */
-        transition: border-color 0.3s, background-color 0.3s;
-    }
-    .dark .task-item {
-        border-color: #334155; /* dark:border-slate-700 */
-    }
+    .task-item { border: 1px solid #e5e7eb; transition: border-color 0.3s, background-color 0.3s; }
+    .dark .task-item { border-color: #334155; }
 
     /* Durum Bazlı Arka Planlar ve Kenarlıklar */
-    /* Status 0: Default */
-    .task-item.status-0 { background-color: #ffffff; } /* bg-white */
-    .dark .task-item.status-0 { background-color: #1e293b; } /* dark:bg-slate-800 */
-    .task-item.status-0:hover { background-color: #f9fafb; } /* hover:bg-gray-50 */
-    .dark .task-item.status-0:hover { background-color: #334155; } /* dark:hover:bg-slate-700 */
+    .task-item.status-0 { background-color: #ffffff; }
+    .dark .task-item.status-0 { background-color: #1e293b; }
+    .task-item.status-0:hover { background-color: #f9fafb; }
+    .dark .task-item.status-0:hover { background-color: #334155; }
 
-    /* Status 1: Tamamlandı (Yeşil) */
     .task-item.status-1 { background-color: #f0fdf4; border-color: #bbf7d0; }
     .dark .task-item.status-1 { background-color: #062616; border-color: #166534; }
     .task-item.status-1:hover { background-color: #dcfce7; }
     .dark .task-item.status-1:hover { background-color: #073b22; }
 
-    /* Status 3: Backend (Turuncu) */
     .task-item.status-3 { background-color: #fff7ed; border-color: #fed7aa; }
     .dark .task-item.status-3 { background-color: #2a1c11; border-color: #9a3412; }
     .task-item.status-3:hover { background-color: #ffedd5; }
     .dark .task-item.status-3:hover { background-color: #402819; }
 
-    /* Status 4: Frontend (Sarı) */
     .task-item.status-4 { background-color: #fefce8; border-color: #fde68a; }
     .dark .task-item.status-4 { background-color: #2a2511; border-color: #b45309; }
     .task-item.status-4:hover { background-color: #fef9c3; }
     .dark .task-item.status-4:hover { background-color: #3f371a; }
 
-    /* Status 5: İptal (Kırmızı) */
     .task-item.status-5 { background-color: #fef2f2; border-color: #fecaca; }
     .dark .task-item.status-5 { background-color: #2a1616; border-color: #b91c1c; }
     .task-item.status-5:hover { background-color: #fee2e2; }
     .dark .task-item.status-5:hover { background-color: #402020; }
 
-    /* Status 6: Yanıt (Mavi) */
     .task-item.status-6 { background-color: #f0f9ff; border-color: #bae6fd; }
     .dark .task-item.status-6 { background-color: #152431; border-color: #0369a1; }
     .task-item.status-6:hover { background-color: #e0f2fe; }
     .dark .task-item.status-6:hover { background-color: #1e3547; }
-    /* --- Bitiş: Durum Bazlı Stiller --- */
-
 
     @media (max-width: 768px){
        .task-row { flex-direction: column; align-items: stretch; gap: .5rem; }
@@ -164,7 +131,7 @@
         <p id="motto" class="text-gray-500 mt-1">Geliştirme ve iyileştirme görevlerinin canlı takip listesi.</p>
       </div>
       <div class="flex items-center gap-3">
-        <button id="dark-toggle" class="p-2 rounded-lg" title="Temayı Değiştir"> <!-- Renkler CSS'den gelecek -->
+        <button id="dark-toggle" class="p-2 rounded-lg" title="Temayı Değiştir">
             <svg id="theme-icon-sun" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.707.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm-.707 8.486a1 1 0 011.414 0l.707-.707a1 1 0 01-1.414-1.414l-.707.707zM3 11a1 1 0 100-2H2a1 1 0 100 2h1z" clip-rule="evenodd" /></svg>
             <svg id="theme-icon-moon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 hidden" viewBox="0 0 20 20" fill="currentColor"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" /></svg>
         </button>
@@ -199,9 +166,9 @@
       </div>
       <div id="detailed-summary" class="mt-2 text-center text-xs text-gray-500 dark:text-slate-400 flex flex-wrap justify-center gap-x-4 gap-y-1"></div>
     </div>
-    
+
     <!-- Filtreler -->
-    <div class="filter-bar mb-5 flex flex-wrap justify-center items-center gap-2 p-2 rounded-lg text-xs"> <!-- Renkler CSS'den gelecek -->
+    <div class="filter-bar mb-5 flex flex-wrap justify-center items-center gap-2 p-2 rounded-lg text-xs">
         <span class="font-semibold text-black dark:text-sky-600" mr-2">Filtreler:</span>
         <button data-filter="all" class="filter-btn px-2 py-1 rounded bg-slate-800 text-white dark:bg-slate-600 dark:hover:bg-slate-500">Tümü</button>
         <button data-filter="1" class="filter-btn px-2 py-1 rounded bg-green-200 text-green-800 dark:bg-green-700 dark:text-green-100">Tamamlandı</button>
@@ -319,15 +286,18 @@
 
     function updateSessionLine(){
       const all = tasks.flatMap(s=>s.items);
+      const total = all.length;
       const completed = all.filter(i=>i.status===1).length;
-      $('#session-line').textContent = `Toplam ${all.length} görevden ${completed} tanesi tamamlandı.`;
-      
       const workingOn = all.filter(i => i.working).length;
       const idle = all.filter(i => i.status === 0 && !i.working).length;
       const waitBe = all.filter(i => i.status === 3).length;
       const waitFe = all.filter(i => i.status === 4).length;
       const canceled = all.filter(i => i.status === 5).length;
       const waitingReply = all.filter(i => i.status === 6).length;
+
+      // İSTENEN CÜMLE: tamamlanan + iptal bilgisi tek satırda
+      const sessionText = `Toplam ${total} görevden ${completed} tanesi tamamlandı${canceled ? `, ${canceled} tanesi İptal edildi.` : '.'}`;
+      $('#session-line').textContent = sessionText;
 
       const summaryEl = $('#detailed-summary');
       if (summaryEl) {
@@ -351,10 +321,10 @@
         await signInAnonymously(auth);
         listenForUpdates();
       }catch(err){
-        console.error("Firebase Kurulum Hatası:", err); // Daha açıklayıcı log
+        console.error("Firebase Kurulum Hatası:", err);
         connectionStatus.classList.remove('hidden');
         connectionStatus.style.opacity = 1; connectionText.textContent = 'Bağlantı hatası. Ortak çalışma devre dışı.';
-        renderTasks(); // Veritabanı olmasa da görevleri göster
+        renderTasks();
       }
     }
 
@@ -377,7 +347,7 @@
         tasks.forEach(section=>{
           section.items.forEach(item=>{
             const saved = savedTasks.find(t=>t.id===item.id);
-             // Önce varsayılanları sıfırla ki silinen veriler temizlensin
+            // Varsayılanları sıfırla (şema/değer silinmesi yok, sadece local state)
             item.status = 0; item.note = ''; item.working = false; item.lastUpdated = 0; item.noteUpdated = 0;
             if(saved){
               item.status = typeof saved.status==='number'? saved.status : 0;
@@ -394,14 +364,13 @@
         updateProgress();
         updateSessionLine();
       }, (error)=>{
-        console.error('Firestore Dinleme Hatası:', error); // Daha açıklayıcı log
+        console.error('Firestore Dinleme Hatası:', error);
         const statusDiv = connectionStatus.querySelector('div');
         statusDiv.classList.add('bg-red-500');
         statusDiv.classList.remove('bg-green-500','animate-pulse');
         connectionText.textContent = 'Bağlantı Koptu';
         connectionText.classList.add('text-red-600');
         connectionStatus.style.opacity = 1;
-        // Bağlantı kopunca da görevleri son bilinen haliyle göster
         renderTasks();
         updateProgress();
         updateSessionLine();
@@ -418,9 +387,8 @@
       })));
       try{
         await setDoc(checklistDocRef, { tasks: stateToSave, boardNotes }, { merge:true });
-        // console.log("Durum başarıyla kaydedildi."); // Başarılı kaydetme logu
       } catch(e){
-        console.error('Durum Kaydetme Hatası:', e); // Daha açıklayıcı log
+        console.error('Durum Kaydetme Hatası:', e);
       }
     }
 
@@ -434,9 +402,12 @@
     }
 
     function updateProgress(){
-      const all = tasks.flatMap(s=>s.items); const total = all.length; if(!total) return;
+      const all = tasks.flatMap(s=>s.items);
+      const total = all.length; if(!total) return;
       const completed = all.filter(i=>i.status===1).length;
-      const pct = Math.round((completed/total)*100);
+      const canceled = all.filter(i=>i.status===5).length;
+      const effective = completed + canceled;
+      const pct = Math.min(100, Math.round((effective/total)*100));
       $('#progress-bar').style.width = pct+'%';
       $('#progress-text').textContent = `${pct}%`;
     }
@@ -468,8 +439,6 @@
         const sectionDiv = document.createElement('div');
         const sectionNumber = sIdx+1;
         sectionDiv.innerHTML = `<h2 class="text-xl font-semibold text-gray-700 border-b border-gray-200 pb-2 mb-3">${sectionNumber}. ${section.section}</h2>`;
-        
-        // GÖREV 3: Madde aralığı artırıldı
         const itemList = document.createElement('div'); itemList.className='space-y-3';
 
         section.items.forEach((item, iIdx)=>{
@@ -483,17 +452,14 @@
           };
           if(!matchByFilter(item)) return;
 
-          // GÖREV: Maddeler arası boşlukları eşitlemek için wrapper div eklendi
           const itemWrapper = document.createElement('div');
-
           const container = document.createElement('div');
           container.setAttribute('data-task-id', item.id);
-          const statusClass = `status-${item.status || 0}`; // status-0'ı da ekle
+          const statusClass = `status-${item.status || 0}`;
           const workingClass = item.working? 'working-ring' : '';
 
-          const infoBadge = item.lastUpdated ? `<span class="badge-updated text-[10px] px-2 py-0.5 rounded-full">${humanizeSince(item.lastUpdated)}</span>` : ''; // Arka plan ve metin renkleri CSS'den gelecek
+          const infoBadge = item.lastUpdated ? `<span class="badge-updated text-[10px] px-2 py-0.5 rounded-full">${humanizeSince(item.lastUpdated)}</span>` : '';
           const workingBadge = item.working ? `<span class="text-[10px] px-2 py-0.5 rounded-full bg-violet-100 dark:bg-violet-900/50 text-violet-700 dark:text-violet-300">Çalışılıyor</span>` : '';
-          
           let statusBadgeHTML = '';
           if (item.status === 3) {
             statusBadgeHTML = `<span class="ml-2 text-xs font-bold px-2 py-0.5 rounded-full bg-orange-100 text-orange-800 dark:bg-orange-900/50 dark:text-orange-300">Backend Bekleniyor</span>`;
@@ -502,19 +468,16 @@
           } else if (item.status === 6) {
             statusBadgeHTML = `<span class="ml-2 text-xs font-bold px-2 py-0.5 rounded-full bg-sky-100 text-sky-800 dark:bg-sky-900/50 dark:text-sky-300">Yanıt Bekleniyor</span>`;
           }
-          
+
           const hasNote = item.note && item.note.trim() !== '';
           const noteIconSVG = hasNote 
               ? `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.94 8.94 0 01-4.062-.982 1 1 0 00-.874.195l-2.036.944a1 1 0 01-1.294-1.294l.944-2.036a1 1 0 00.195-.874A8.94 8.94 0 012 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9a1 1 0 11-2 0 1 1 0 012 0zm4 0a1 1 0 11-2 0 1 1 0 012 0zm4 0a1 1 0 11-2 0 1 1 0 012 0z" clip-rule="evenodd" /></svg>` 
               : `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" /></svg>`;
-          
+
           const hasDetails = item.details && item.details.trim() !== '';
-          
-          // GÖREV 2: Toggle butonlara dark mode renkleri eklendi
           const detailsIconHTML = hasDetails ? `<button class="details-toggle-btn text-gray-400 hover:text-blue-600 dark:text-slate-500 dark:hover:text-blue-400 p-1 rounded-full -ml-1" title="Detayları Gör"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" /></svg></button>` : '';
 
-          // GÖREV 3: p-2 -> p-3 yapıldı, hover:bg-gray-50 kaldırıldı
-          container.className = `task-item ${statusClass} ${workingClass} p-3 rounded-lg`; 
+          container.className = `task-item ${statusClass} ${workingClass} p-3 rounded-lg`;
           container.innerHTML = `
             <div class="task-row flex items-center gap-2">
               <span class="task-text font-medium text-gray-800 flex-1 flex items-center">
@@ -534,7 +497,6 @@
                    <div class="flex justify-center radio-5-wrap rounded-md p-1"><input type="radio" class="radio-5" name="status-${item.id}" value="5" title="İptal" ${item.status===5?'checked':''}></div>
                    <div class="flex justify-center radio-6-wrap rounded-md p-1"><input type="radio" class="radio-6" name="status-${item.id}" value="6" title="Yanıt Bekleniyor" ${item.status===6?'checked':''}></div>
               </div>
-              <!-- GÖREV 2: Toggle butona dark mode renkleri eklendi -->
               <button class="note-toggle-btn ml-2 text-gray-400 hover:text-blue-600 dark:text-slate-500 dark:hover:text-blue-400 p-1 rounded-full" title="Not Ekle/Aç">
                 ${noteIconSVG}
               </button>
@@ -546,7 +508,6 @@
 
           const detailsSection = document.createElement('div');
           if (hasDetails) {
-            // GÖREV 1: Details-section class'ları temizlendi, CSS'e taşındı
             detailsSection.className = 'details-section rounded-lg px-4 text-sm';
             detailsSection.innerHTML = `<p class="py-2">${item.details}</p>`;
           }
@@ -588,11 +549,10 @@
             item.lastUpdated = Date.now(); bumpRecent(item, item.label); renderTasks();
           })
 
-          // GÖREV: Wrapper div'e append et
           itemWrapper.appendChild(container);
           if (hasDetails) itemWrapper.appendChild(detailsSection);
           itemWrapper.appendChild(noteSection);
-          itemList.appendChild(itemWrapper); // Ana liste kabına wrapper'ı append et
+          itemList.appendChild(itemWrapper);
         })
         sectionDiv.appendChild(itemList);
         taskListContainer.appendChild(sectionDiv);
@@ -645,22 +605,19 @@
 
     function buildNotesSummary(){
       const wrap = $('#notes-summary'); 
-      // wrap.innerHTML='<span class="text-xs text-gray-500 dark:text-slate-400">Tüm görev notlarının bir özeti aşağıda listelenir.</span>'; // Kaldırıldı
       const allNotes = tasks.flatMap(s=>s.items).filter(i=> (i.note||'').trim().length > 0);
       if(!allNotes.length) {
           wrap.innerHTML = '<span class="text-xs text-gray-500 dark:text-slate-400">Henüz hiçbir göreve not eklenmemiş.</span>';
           return;
       }
-      
       let html = '<ul class="mt-2 space-y-2">';
       allNotes.forEach(n => {
-          // Genel Notlar içindeki madde rozetini (badge) span olarak değiştiriyoruz ve dark mode sınıfı ekliyoruz
           html += `<li class="py-1"><span class="badge text-[11px] px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-700 mr-2 text-slate-700 dark:text-slate-200">${n.label||n.id}</span>${n.note}</li>`;
       });
       html += '</ul>';
       wrap.innerHTML = html;
     }
-    
+
     $('#bulk-notes').addEventListener('toggle', (event) => {
         if (event.target.open) {
             buildNotesSummary();
@@ -680,9 +637,6 @@
     document.documentElement.classList.remove('dark'); // Başlangıçta dark sınıfını kaldır
     $('#theme-icon-sun').classList.toggle('hidden', isInitiallyDark);
     $('#theme-icon-moon').classList.toggle('hidden', !isInitiallyDark);
-
-
   </script>
 </body>
 </html>
-
